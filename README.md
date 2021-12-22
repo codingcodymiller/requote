@@ -1,3 +1,3 @@
-# final-project
+# Requote
 
-A full stack JavaScript solo project.
+A web application for storing quotes from your favorite books.
