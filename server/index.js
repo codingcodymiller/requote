@@ -1,6 +1,6 @@
 require('dotenv/config');
 const express = require('express');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const errorMiddleware = require('./error-middleware');
 const staticMiddleware = require('./static-middleware');
 
@@ -20,8 +20,8 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/auth', (req, res) => {
-  // const token = jwt.decode(req.body)
+  const token = jwt.decode(req.body.credential);
 
   // eslint-disable-next-line no-console
-  console.log(req.body);
+  console.log(token);
 });
