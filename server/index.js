@@ -19,5 +19,5 @@ app.post('/auth', (req, res) => {
   // const token = jwt.decode(req.body)
 
   // eslint-disable-next-line no-console
-  console.log(Object.keys(req));
+  console.log('Parameters:', req.params, 'Headers:', req.headers);
 });
