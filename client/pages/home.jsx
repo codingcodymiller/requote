@@ -8,7 +8,7 @@ export default function Home(props) {
         data-context="signin"
         data-ux_mode="popup"
         data-login_uri="https://requote-app.herokuapp.com/auth"
-        data-auto_select="true">
+        data-auto_prompt="false">
       </div>
 
       <div className="g_id_signin"
