@@ -1,6 +1,7 @@
 require('dotenv/config');
 const express = require('express');
 // const jwt = require('jsonwebtoken');
+const fetch = require('node-fetch');
 const errorMiddleware = require('./error-middleware');
 const staticMiddleware = require('./static-middleware');
 
