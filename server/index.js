@@ -14,7 +14,7 @@ app.listen(process.env.PORT, () => {
   console.log(`express server listening on port ${process.env.PORT}`);
 });
 
-app.get('/auth', (req, res) => {
+app.post('/auth', (req, res) => {
   // eslint-disable-next-line no-console
-  console.log(req.params);
+  res.send(req.body);
 });
