@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 require('dotenv/config');
 const express = require('express');
 // const jwt = require('jsonwebtoken');
@@ -29,7 +30,7 @@ app.post('/auth', (req, res) => {
     }
   })
     .then(response => {
-    // eslint-disable-next-line no-console
       console.log('Response:', response);
-    });
+    })
+    .catch(err => console.log('Error:', err));
 });
