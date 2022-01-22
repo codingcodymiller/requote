@@ -41,7 +41,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/auth', async (req, res) => {
-  const { code } = req.params;
+  const { code } = req.query;
   const { tokens } = await oauth2Client.getToken(code);
   oauth2Client.setCredentials(tokens);
   console.log(oauth2Client.credentials);
