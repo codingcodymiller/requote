@@ -1,9 +1,10 @@
 import React from 'react';
+import Header from '../components/header.jsx';
 
 export default function Home(props) {
   return (
     <>
-      <h3>Testing...</h3>
+      <Header/>
     </>
   );
 }
