@@ -2,8 +2,24 @@
   background-color: #45b2d5;
 }
 
+.bg-lavender-grey {
+  background-color: #f3eaf4;
+}
+
 .text-dark-navy {
   color: #3a405a;
+}
+
+.text-light-grey {
+  color: #838383;
+}
+
+.section-header {
+  border-bottom: 1px solid #838383;
+}
+
+.rounded-border-top {
+  border-radius: 20px 20px 0 0;
 }
 
 .mobile-nav {
@@ -12,4 +28,8 @@
   position: fixed;
   bottom: 0;
   height: 80px;
+}
+
+.main-content {
+  min-height: 90vh;
 }

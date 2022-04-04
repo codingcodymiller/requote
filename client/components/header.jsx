@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Header(props) {
   return (
-    <header className="container-fluid py-3">
+    <header className="container-fluid py-3 header-size">
       <div className="row justify-content-between">
         <img className="col-5 col-sm-4 col-md-3 col-lg-2" src="/logo.svg" alt="ReQuote logo" />
         <nav className="col-6 justify-content-end align-items-center d-none d-md-flex desktop-nav">
