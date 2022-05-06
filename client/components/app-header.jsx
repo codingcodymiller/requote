@@ -4,7 +4,9 @@ export default function Header(props) {
   return (
     <header className="container-fluid py-3 header-size">
       <div className="row justify-content-between">
-        <img className="col-5 col-sm-4 col-md-3 col-lg-2" src="/logo.svg" alt="ReQuote logo" />
+        <div className="col-5 col-sm-4 col-md-3 col-lg-2">
+          <img className="logo" src="/logo.svg" alt="ReQuote logo" />
+        </div>
         <nav className="col-6 justify-content-end align-items-center d-none d-md-flex desktop-nav">
           <a href="" className="text-dark-navy">
             <i className="fa-solid fa-pen-clip fa-xl m-1"></i>

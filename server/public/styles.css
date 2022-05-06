@@ -33,3 +33,8 @@
 .main-content {
   min-height: 90vh;
 }
+
+.logo {
+  width: 100%;
+  max-width: 170px;
+}

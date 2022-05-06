@@ -9,7 +9,7 @@
     "start": "node server/index.js",
     "dev": "npm-run-all --silent --parallel dev:*",
     "dev:client": "webpack serve --mode=development",
-    "dev:server": "nodemon server/index.js",
+    "dev:server": "nodemon --inspect server/index.js",
     "db:import": "bash scripts/db-import.sh",
     "prepare": "husky install"
   },
