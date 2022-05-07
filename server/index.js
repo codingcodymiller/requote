@@ -26,24 +26,25 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URL
 );
 
-google.options({ auth: oauth2Client });
-
-const url = oauth2Client.generateAuthUrl({
-  access_type: 'offline',
-  scope: 'https://www.googleapis.com/auth/books'
-});
-
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`express server listening on port ${process.env.PORT}`);
 });
 
-app.post('/api/login', (req, res) => {
+app.get('/api/login', (req, res) => {
+  const urlSegments = [
+    'response_type=code',
+    'access_type=offline',
+    `client_id=${process.env.GOOGLE_CLIENT_ID}`,
+    `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
+    `scope=${encodeURIComponent('openid email profile')}`
+  ];
+  const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urlSegments.join('&');
   res.redirect(url);
 });
 
-app.get('/api/test', (req, res) => {
-  console.log('Testing!');
+app.get('/api/search/:book', (req, res) => {
+  console.log('Testing!!!');
 });
 
 app.get('/api/auth', async (req, res) => {
