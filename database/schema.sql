@@ -39,7 +39,6 @@ CREATE TABLE "public"."books" (
 CREATE TABLE "public"."users" (
 	"id" serial NOT NULL,
 	"token" TEXT NOT NULL,
-	"refreshToken" TEXT NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

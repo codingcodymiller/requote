@@ -2,10 +2,10 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
+const fetch = require('node-fetch');
+const jwt = require('jsonwebtoken');
 const errorMiddleware = require('./error-middleware');
 const staticMiddleware = require('./static-middleware');
-
-const fetch = require('node-fetch');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -52,24 +52,31 @@ app.get('/api/auth', async (req, res) => {
   });
   const response = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
   const tokens = await response.json();
-  console.log('tokens:', tokens);
 
-  const { access_token: token, refresh_token: refreshToken } = tokens;
-  const sql = `
-    insert into "users" ("token", "refreshToken")
-    values ($1, $2)
-    returning *
+  const { access_token: token, refresh_token: refreshToken, id_token: idTokenRaw } = tokens;
+  const decodedId = jwt.decode(idTokenRaw);
+
+  const findExistingUser = `
+      select * from "users"
+      where "token" = $1
   `;
-  const params = [token, refreshToken];
-  try {
-    const result = await db.query(sql, params);
-    const [user] = result.rows;
-    res.cookie('access_token', token).cookie('refresh_token', refreshToken).status(201).json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      error: err.message,
-      stack: err.stack
-    });
+  const params = [decodedId.sub];
+  const result = await db.query(findExistingUser, params);
+  let [user] = result.rows;
+
+  if (!user) {
+    console.log('New user!');
+    const createNewUser = `
+    insert into "users" ("token")
+    values ($1)
+    returning *
+    `;
+    const result = await db.query(createNewUser, params);
+    user = result.rows[0];
   }
+  res.cookie('access_token', token)
+    .cookie('refresh_token', refreshToken)
+    .cookie('user_id', user.id)
+    .status(201)
+    .redirect('/');
 });
