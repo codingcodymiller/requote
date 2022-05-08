@@ -12,12 +12,14 @@ export default function Header(props) {
             <i className="fa-solid fa-pen-clip fa-xl m-1"></i>
             Save Quote
           </a>
+          {/* <p>{document.cookie.includes('user_id') ? 'Logged In' : 'Not Logged In'}</p> */}
         </nav>
         <nav className="col-12 d-flex justify-content-center align-items-center d-md-none mobile-nav">
           <a href="" className="text-center text-dark-navy">
             <i className="d-block m-3 fa-solid fa-pen-clip fa-xl"></i>
             <span className="text-small">Save Quote</span>
           </a>
+          {/* <p>{document.cookie.includes('user_id') ? 'Logged In' : 'Not Logged In'}</p> */}
         </nav>
       </div>
     </header>

@@ -1,6 +1,6 @@
 import React from 'react';
 import AppHeader from './components/app-header.jsx';
-import Home from './pages/home';
+// import Home from './pages/home';
 import BookSearch from './pages/book-search';
 
 export default class App extends React.Component {
@@ -11,7 +11,7 @@ export default class App extends React.Component {
         <main className="bg-lavender-grey rounded-border-top main-content">
           <div className="container">
             <BookSearch />
-            <Home />
+            {/* <Home /> */}
           </div>
         </main>
       </>

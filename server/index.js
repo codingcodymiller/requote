@@ -25,20 +25,30 @@ app.listen(process.env.PORT, () => {
   console.log(`express server listening on port ${process.env.PORT}`);
 });
 
+app.get('/api/search/:book', async (req, res) => {
+  const queryParams = [
+    'orderBy=relevance',
+    'printType=books',
+    'projection=lite',
+    'maxResults=40',
+    `q=${req.params.book}`
+  ];
+  const url = 'https://www.googleapis.com/books/v1/volumes?' + queryParams.join('&');
+  const response = await fetch(url);
+  const bookData = await response.json();
+  res.status(200).json(bookData);
+});
+
 app.get('/api/login', (req, res) => {
-  const urlSegments = [
+  const queryParams = [
     'response_type=code',
     'access_type=offline',
     `client_id=${process.env.GOOGLE_CLIENT_ID}`,
     `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
     `scope=${encodeURIComponent('openid email profile')}`
   ];
-  const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + urlSegments.join('&');
+  const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + queryParams.join('&');
   res.redirect(url);
-});
-
-app.get('/api/search/:book', (req, res) => {
-  console.log('Testing!!!');
 });
 
 app.get('/api/auth', async (req, res) => {
@@ -65,7 +75,6 @@ app.get('/api/auth', async (req, res) => {
   let [user] = result.rows;
 
   if (!user) {
-    console.log('New user!');
     const createNewUser = `
     insert into "users" ("token")
     values ($1)
