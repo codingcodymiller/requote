@@ -39,7 +39,8 @@ module.exports = {
     },
     proxy: {
       '/api': `http://localhost:${process.env.PORT}`
-    }
+    },
+    historyApiFallback: true
   },
   stats: 'summary',
   performance: {

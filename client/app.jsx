@@ -1,20 +1,21 @@
 import React from 'react';
-import AppHeader from './components/app-header.jsx';
-// import Home from './pages/home';
+import {
+  Routes,
+  Route
+} from 'react-router-dom';
+import Home from './pages/home';
+import Library from './pages/library';
 import BookSearch from './pages/book-search';
+import SaveQuote from './pages/save-quote';
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <>
-        <AppHeader />
-        <main className="bg-lavender-grey rounded-border-top main-content">
-          <div className="container">
-            <BookSearch />
-            {/* <Home /> */}
-          </div>
-        </main>
-      </>
-    );
-  }
+export default function App() {
+  return (
+    <Routes>
+      <Route exact path="/" element={<Home />} />
+      <Route path="/library" element={<Library />}>
+        <Route path="book-search" element={<BookSearch />} />
+        <Route path="save-quote" element={<SaveQuote />} />
+      </Route>
+    </Routes>
+  );
 }

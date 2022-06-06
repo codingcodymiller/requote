@@ -23,7 +23,7 @@
 }
 
 .mobile-nav {
-  border-top: 2px solid darkgrey;
+  border-top: 1px solid darkgrey;
   background-color: white;
   position: fixed;
   bottom: 0;
@@ -45,4 +45,12 @@
   aspect-ratio: 1/1;
   object-fit: cover;
   object-position: top;
+}
+
+.two-line-truncate {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
