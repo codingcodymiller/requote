@@ -4,6 +4,7 @@ const pg = require('pg');
 const express = require('express');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const staticMiddleware = require('./static-middleware');
 
@@ -19,6 +20,10 @@ const app = express();
 app.use(staticMiddleware);
 
 app.use(errorMiddleware);
+
+app.use(cookieParser());
+
+app.use(express.json());
 
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
@@ -87,5 +92,16 @@ app.get('/api/auth', async (req, res) => {
     .cookie('refresh_token', refreshToken)
     .cookie('user_id', user.id)
     .status(201)
-    .redirect('/');
+    .redirect('/library/book-search');
+});
+
+app.post('/api/save', async (req, res) => {
+  // const quoteData = req.body;
+  // const createNewQuote = `
+  //   insert into "quotes" ("quoteText", "page", "bookId", "userId")
+  //   values ($1)
+  //   returning *
+  //   `;
+  // const result = await db.query(createNewUser, params);
+  // user = result.rows[0];
 });

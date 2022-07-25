@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { SelectedBookContext } from '../pages/library';
 
 export default function BookListItem(props) {
-  const { book } = props;
+  const selectedBookData = useContext(SelectedBookContext);
+  const navigate = useNavigate();
+  const book = (({ imageLinks, title, authors, bookId, detailsUrl }) => ({ imageLinks, title, authors, bookId, detailsUrl }))(props.book);
   return (
-    <div className="col-12 col-md-6 col-lg-4 my-2">
+    <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={e => {
+      selectedBookData.setBookData(book);
+      navigate('../save-quote', { replace: false });
+    }}>
       <div className="card h-100 shadow-sm p-2">
         <div className="row h-100">
           <div className="col-3 d-flex align-items-center">

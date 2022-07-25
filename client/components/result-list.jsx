@@ -6,7 +6,7 @@ export default function ResultList(props) {
 
   const results = props.results
     .filter(({ volumeInfo }) => Boolean(volumeInfo.imageLinks))
-    .map(({ volumeInfo: book, id: bookId }) => <BookListItem book={book} key={bookId} />);
+    .map(({ volumeInfo: bookData, id: bookId, selfLink: detailsUrl }) => <BookListItem book={{ ...bookData, bookId, detailsUrl }} key={bookId} />);
 
   return (
     <div className="row">
