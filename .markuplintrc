@@ -23,6 +23,13 @@
   },
   "nodeRules": [
     {
+      "selector": "meta",
+      "rules": {
+        "invalid-attr": false,
+        "required-attr": false
+      }
+    },
+    {
       "selector": "link",
       "rules": {
         "character-reference": false

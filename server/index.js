@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 require('dotenv/config');
 const pg = require('pg');
+const path = require('path');
 const express = require('express');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-const staticMiddleware = require('./static-middleware');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -17,7 +17,13 @@ const db = new pg.Pool({
 
 const app = express();
 
-app.use(staticMiddleware);
+const publicPath = path.join(__dirname, 'public');
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(require('./dev-middleware')(publicPath));
+} else {
+  app.use(express.static(publicPath));
+}
 
 app.use(errorMiddleware);
 
@@ -26,8 +32,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.listen(process.env.PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`express server listening on port ${process.env.PORT}`);
+  process.stdout.write(`\n\napp listening on port ${process.env.PORT}\n\n`);
 });
 
 app.get('/api/search/:book', async (req, res) => {
