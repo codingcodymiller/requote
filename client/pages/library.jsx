@@ -11,7 +11,7 @@ export default function Library() {
       imageLinks: {},
       authors: [],
       detailsUrl: '',
-      bookId: ''
+      gBooksId: ''
     },
     setBookData: function (bookData) {
       this.bookData = bookData;

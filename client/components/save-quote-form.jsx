@@ -5,23 +5,22 @@ import FormTextArea from '../components/form-textarea';
 import { SelectedBookContext } from '../pages/library';
 
 export default function SaveQuoteForm(props) {
-  const { bookId } = useContext(SelectedBookContext).bookData;
-  if (!bookId) return <Navigate to="../book-search" />;
+  const { gBooksId } = useContext(SelectedBookContext).bookData;
+  if (!gBooksId) return <Navigate to="../book-search" />;
 
   const handleSubmit = e => {
     event.preventDefault();
-    // const quoteData = {
-    //   page: e.target.elements.page.value,
-    //   quote: e.target.elements.quote.value,
-    //   bookId
-    // };
-    // console.log('Quote Data:', quoteData);
-    // fetch('/api/save', {
-    //   method: 'post',
-    //   body: quoteData
-    // })
-    //   .then(res => res.json())
-    //   .then(res => props.updateResults(res.items));
+    const quoteData = {
+      page: e.target.elements.page.value || null,
+      quoteText: e.target.elements.quote.value,
+      gBooksId
+    };
+    fetch('/api/save', {
+      method: 'post',
+      body: quoteData
+    })
+      .then(res => res.json())
+      .then(res => <Navigate to="../book-search" />);
   };
   return (
     <form onSubmit={handleSubmit}>

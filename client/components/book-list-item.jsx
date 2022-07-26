@@ -5,7 +5,7 @@ import { SelectedBookContext } from '../pages/library';
 export default function BookListItem(props) {
   const selectedBookData = useContext(SelectedBookContext);
   const navigate = useNavigate();
-  const book = (({ imageLinks, title, authors, bookId, detailsUrl }) => ({ imageLinks, title, authors, bookId, detailsUrl }))(props.book);
+  const book = (({ imageLinks, title, authors, gBooksId, detailsUrl }) => ({ imageLinks, title, authors, gBooksId, detailsUrl }))(props.book);
   return (
     <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={e => {
       selectedBookData.setBookData(book);

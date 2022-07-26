@@ -96,12 +96,13 @@ app.get('/api/auth', async (req, res) => {
 });
 
 app.post('/api/save', async (req, res) => {
-  // const quoteData = req.body;
+  // const { quoteText, page, gBooksId } = req.body;
   // const createNewQuote = `
-  //   insert into "quotes" ("quoteText", "page", "bookId", "userId")
+  //   insert into "quotes" ("quoteText", "page", "gBooksId", "userId")
   //   values ($1)
   //   returning *
   //   `;
-  // const result = await db.query(createNewUser, params);
-  // user = result.rows[0];
+  // const params = [quoteText, page, gBooksId, req.cookies.user_id];
+  // const result = await db.query(createNewQuote, params);
+  // const newQuote = result.rows[0];
 });
