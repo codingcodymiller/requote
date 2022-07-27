@@ -1,26 +1,31 @@
 import React, { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import FormInput from '../components/form-input';
 import FormTextArea from '../components/form-textarea';
 import { SelectedBookContext } from '../pages/library';
 
 export default function SaveQuoteForm(props) {
-  const { gBooksId } = useContext(SelectedBookContext).bookData;
+  const navigate = useNavigate();
+  const { gBooksId, title } = useContext(SelectedBookContext).bookData;
   if (!gBooksId) return <Navigate to="../book-search" />;
-
   const handleSubmit = e => {
-    event.preventDefault();
+    e.preventDefault();
     const quoteData = {
       page: e.target.elements.page.value || null,
       quoteText: e.target.elements.quote.value,
+      bookTitle: title,
       gBooksId
     };
     fetch('/api/save', {
       method: 'post',
-      body: quoteData
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(quoteData)
     })
       .then(res => res.json())
-      .then(res => <Navigate to="../book-search" />);
+      .then(res => navigate('../book-search', { replace: false }));
   };
   return (
     <form onSubmit={handleSubmit}>
