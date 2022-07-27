@@ -35,6 +35,34 @@ app.listen(process.env.PORT, () => {
   process.stdout.write(`\n\napp listening on port ${process.env.PORT}\n\n`);
 });
 
+app.post('/api/save', async (req, res) => {
+  const { quoteText, page, gBooksId, bookTitle } = req.body;
+  const selectOrInsertBook = `
+    with "book" as (
+      insert into "books"
+        ("title", "gBooksId")
+      values
+        ($1, $2)
+      on conflict ("gBooksId")
+      do nothing
+      returning "id"
+    ),
+    "existingBook" as (
+      select "id" from "books"
+      where "gBooksId" = $2
+    )
+    insert into "quotes" ("bookId", "page", "quoteText", "userId")
+    select coalesce("existingBook"."id", "book"."id"), $3, $4, $5
+    from "book"
+    full join "existingBook" on true
+    returning *
+  `;
+  const params = [bookTitle, gBooksId, page, quoteText, req.cookies.user_id];
+  const result = await db.query(selectOrInsertBook, params);
+  const newQuote = result.rows[0];
+  res.status(201).json(newQuote);
+});
+
 app.get('/api/search/:book', async (req, res) => {
   const queryParams = [
     'orderBy=relevance',
@@ -100,14 +128,14 @@ app.get('/api/auth', async (req, res) => {
     .redirect('/library/book-search');
 });
 
-app.post('/api/save', async (req, res) => {
-  // const { quoteText, page, gBooksId } = req.body;
-  // const createNewQuote = `
-  //   insert into "quotes" ("quoteText", "page", "gBooksId", "userId")
-  //   values ($1)
-  //   returning *
-  //   `;
-  // const params = [quoteText, page, gBooksId, req.cookies.user_id];
-  // const result = await db.query(createNewQuote, params);
-  // const newQuote = result.rows[0];
+app.get('/api/*', function (req, res) {
+  res.status(404).json({ message: 'API Endpoint does not exist' });
+});
+
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, '/public/index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
 });
