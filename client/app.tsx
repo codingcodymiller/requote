@@ -11,7 +11,7 @@ import SaveQuote from './pages/save-quote';
 export default function App() {
   return (
     <Routes>
-      <Route exact path="/" element={<Home />} />
+      <Route path="/" element={<Home />} />
       <Route path="/library" element={<Library />}>
         <Route path="book-search" element={<BookSearch />} />
         <Route path="save-quote" element={<SaveQuote />} />
