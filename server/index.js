@@ -125,7 +125,7 @@ app.get('/api/auth', async (req, res) => {
     .cookie('refresh_token', refreshToken)
     .cookie('user_id', user.id)
     .status(201)
-    .redirect('/library/book-search');
+    .redirect('/save-quote/book-search');
 });
 
 app.get('/api/*', function (req, res) {

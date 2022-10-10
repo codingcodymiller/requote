@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function AppHeader(props) {
+export default function AppHeader() {
   return (
     <header className="container-fluid py-3 header-size">
       <div className="row justify-content-between">
