@@ -15,7 +15,7 @@ module.exports = {
     isDevelopment && 'webpack-hot-middleware/client?timeout=1000'
   ].filter(Boolean),
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js']
   },
   output: {
     path: serverPublicPath
@@ -23,7 +23,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(t|j)sx$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',

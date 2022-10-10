@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import FormInput from '../components/form-input';
-import FormTextArea from '../components/form-textarea';
+import FormControlInput from './form-control-input';
+import FormControlTextArea from './form-control-textarea';
 import { SelectedBookContext } from '../pages/library';
 
 export default function SaveQuoteForm(props) {
@@ -29,7 +29,7 @@ export default function SaveQuoteForm(props) {
   };
   return (
     <form onSubmit={handleSubmit}>
-      <FormInput
+      <FormControlInput
         label="Page Number"
         type="number"
         name="page"
@@ -37,7 +37,7 @@ export default function SaveQuoteForm(props) {
         placeholder="Ex: 42"
         optional
       />
-      <FormTextArea
+      <FormControlTextArea
         label="Quote"
         name="quote"
         id="page-number"

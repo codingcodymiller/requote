@@ -3,7 +3,7 @@ import SectionHeader from '../components/section-header';
 import SearchBar from '../components/search-bar';
 import ResultList from '../components/result-list';
 
-export default function BookSearch(props) {
+export default function BookSearch() {
   const [results, updateResults] = useState([]);
 
   return (

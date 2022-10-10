@@ -1,8 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import AppHeader from '../components/app-header.jsx';
+import AppHeader from '../components/app-header.js';
 
-export const SelectedBookContext = React.createContext();
+export const SelectedBookContext = React.createContext(undefined);
 
 export default function Library() {
   const selectedBookData = {

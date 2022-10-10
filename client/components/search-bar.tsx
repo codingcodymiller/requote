@@ -1,5 +1,5 @@
 import React from 'react';
-import FormInput from '../components/form-input';
+import FormControlInput from './form-control-input';
 
 export default function SearchBar(props) {
   const handleSearchSubmit = event => {
@@ -10,7 +10,7 @@ export default function SearchBar(props) {
   };
   return (
     <form onSubmit={handleSearchSubmit}>
-        <FormInput
+        <FormControlInput
           label="Book Title"
           type="text"
           name="search"
@@ -20,7 +20,7 @@ export default function SearchBar(props) {
           <button className="position-absolute translate-middle-y end-0 top-50 mx-3 border-0 bg-transparent">
             <i className="fa-solid fa-magnifying-glass"></i>
           </button>
-        </FormInput>
+        </FormControlInput>
     </form>
   );
 }
