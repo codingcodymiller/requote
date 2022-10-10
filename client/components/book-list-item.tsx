@@ -1,15 +1,19 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SelectedBookContext } from '../pages/library';
+import { SelectedBookContext, BookDataContextValue, BookData } from '../pages/save-quote';
 
-export default function BookListItem(props) {
-  const selectedBookData = useContext(SelectedBookContext);
+type SingleBookProps = {
+  book: BookData;
+}
+
+export default function BookListItem(props: SingleBookProps) {
+  const selectedBookData: BookDataContextValue = useContext(SelectedBookContext);
   const navigate = useNavigate();
   const book = (({ imageLinks, title, authors, gBooksId, detailsUrl }) => ({ imageLinks, title, authors, gBooksId, detailsUrl }))(props.book);
   return (
     <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={e => {
       selectedBookData.setBookData(book);
-      navigate('../save-quote', { replace: false });
+      navigate('/save-quote/form', { replace: false });
     }}>
       <div className="card h-100 shadow-sm p-2">
         <div className="row h-100">

@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 
-export default function FormControlTextArea(props) {
+type TextAreaAttributes = {
+  name: string;
+  id?: string;
+  rows?: number;
+  placeholder?: string;
+  required?: boolean
+}
+
+export default function FormControlTextArea(props: TextAreaAttributes) {
   const [value, updateValue] = useState('');
-  const { children, optional, ...config } = props;
   return (
-    <>
-      <label htmlFor={props.id} className="d-inline-block px-2 my-2">
-        {props.label}
-        {optional ? <span className="text-secondary fw-light fst-italic px-2">- Optional</span> : ''}
-      </label>
-      <div className="position-relative col-12">
-        <textarea
-          {...config}
-          className="position-relative col-12 h-100 p-2 border-1 border-light rounded shadow-sm"
-          value={value}
-          onChange={event => updateValue(event.target.value)}
-          required={props.required}
-        />
-        {children}
-      </div>
-    </>
+    <textarea
+      className="position-relative col-12 h-100 p-2 border-1 border-light rounded shadow-sm"
+      value={value}
+      name={props.name}
+      required={props.required}
+      id={props.id || undefined}
+      rows={props.rows || undefined}
+      placeholder={props.placeholder || ""}
+      onChange={event => updateValue(event.target.value)}
+    />
   );
 }

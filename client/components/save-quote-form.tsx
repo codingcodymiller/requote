@@ -2,17 +2,24 @@ import React, { useContext } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';
-import { SelectedBookContext } from '../pages/library';
+import FormControlLabel from './form-control-label';
+import { SelectedBookContext } from '../pages/save-quote';
 
-export default function SaveQuoteForm(props) {
+interface SaveQuoteFormControls extends HTMLFormControlsCollection {
+  page: HTMLInputElement;
+  quote: HTMLTextAreaElement;
+}
+
+export default function SaveQuoteForm() {
   const navigate = useNavigate();
-  const { gBooksId, title } = useContext(SelectedBookContext).bookData;
-  if (!gBooksId) return <Navigate to="../book-search" />;
-  const handleSubmit = e => {
+  const { gBooksId, title } = useContext(SelectedBookContext).data;
+  if (!gBooksId) return <Navigate to="/save-quote/book-search" />;
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formControls = e.currentTarget.elements as SaveQuoteFormControls;
     const quoteData = {
-      page: e.target.elements.page.value || null,
-      quoteText: e.target.elements.quote.value,
+      page: formControls.page.value || null,
+      quoteText: formControls.quote.value,
       bookTitle: title,
       gBooksId
     };
@@ -29,19 +36,25 @@ export default function SaveQuoteForm(props) {
   };
   return (
     <form onSubmit={handleSubmit}>
-      <FormControlInput
+      <FormControlLabel
         label="Page Number"
+        id="page-number"
+        optional
+      />
+      <FormControlInput
         type="number"
         name="page"
         id="page-number"
         placeholder="Ex: 42"
-        optional
+      />
+      <FormControlLabel
+        label="Quote"
+        id="quote"
       />
       <FormControlTextArea
-        label="Quote"
         name="quote"
-        id="page-number"
-        rows="6"
+        id="quote"
+        rows={6}
         placeholder="Once upon a midnight dreary..."
         required
       />
