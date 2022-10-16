@@ -9,7 +9,7 @@ create schema "public";
 CREATE TABLE "public"."quotes" (
 	"created" TIMESTAMP NOT NULL DEFAULT NOW(),
 	"quoteText" TEXT NOT NULL,
-	"page" integer NOT NULL DEFAULT 0,
+	"page" integer DEFAULT NULL,
 	"bookId" integer NOT NULL,
 	"id" serial NOT NULL,
 	"userId" integer NOT NULL,
