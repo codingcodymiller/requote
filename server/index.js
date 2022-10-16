@@ -79,11 +79,10 @@ app.get('/api/search/:book', async (req, res) => {
 
 app.get('/api/quotes', async (req, res) => {
   const getQuotes = `
-    select *
+    select "page", "quoteText"
     from "quotes"
     where "userId" = $1
     order by "created" desc
-    returning *
   `;
   const params = [req.cookies.user_id];
   const result = await db.query(getQuotes, params);
