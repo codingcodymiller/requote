@@ -77,6 +77,20 @@ app.get('/api/search/:book', async (req, res) => {
   res.status(200).json(bookData);
 });
 
+app.get('/api/quotes', async (req, res) => {
+  const getQuotes = `
+    select *
+    from "quotes"
+    where "userId" = $1
+    order by "created" desc
+    returning *
+  `;
+  const params = [req.cookies.user_id];
+  const result = await db.query(getQuotes, params);
+  const quoteList = result.rows;
+  res.status(200).json(quoteList);
+});
+
 app.get('/api/login', (req, res) => {
   const queryParams = [
     'response_type=code',
