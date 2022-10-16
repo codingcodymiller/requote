@@ -36,13 +36,13 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, gBooksId, bookTitle } = req.body;
+  const { quoteText, page, gBooksId, bookTitle, bookAuthors } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "gBooksId")
+        ("title", "authors", "gBooksId")
       values
-        ($1, $2)
+        ($1, $2, $3)
       on conflict ("gBooksId")
       do nothing
       returning "id"
@@ -52,12 +52,12 @@ app.post('/api/save', async (req, res) => {
       where "gBooksId" = $2
     )
     insert into "quotes" ("bookId", "page", "quoteText", "userId")
-    select coalesce("existingBook"."id", "book"."id"), $3, $4, $5
+    select coalesce("existingBook"."id", "book"."id"), $4, $5, $6
     from "book"
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, gBooksId, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, gBooksId, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);

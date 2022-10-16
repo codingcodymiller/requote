@@ -23,6 +23,7 @@ CREATE TABLE "public"."quotes" (
 CREATE TABLE "public"."books" (
 	"id" serial NOT NULL,
 	"title" TEXT NOT NULL,
+  "authors" TEXT[],
 	"gBooksId" TEXT UNIQUE NOT NULL,
 	CONSTRAINT "books_pk" PRIMARY KEY ("id")
 ) WITH (
