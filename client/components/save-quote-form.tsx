@@ -33,7 +33,7 @@ export default function SaveQuoteForm() {
       body: JSON.stringify(quoteData)
     })
       .then(res => res.json())
-      .then(res => navigate('../book-search', { replace: false }));
+      .then(res => navigate('/quotes', { replace: false }));
   };
   return (
     <form onSubmit={handleSubmit}>

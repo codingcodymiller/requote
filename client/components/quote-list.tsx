@@ -6,7 +6,7 @@ type QuoteListProps = {
 }
 
 export default function QuoteList(props: QuoteListProps){
-  const quotes = props.quotes.map(quote => <QuoteListItem quote={quote} />  )
+  const quotes = props.quotes.map(quote => <QuoteListItem quote={quote} key={quote.quoteId} />  )
   return (
     <div className="row">
       { quotes }

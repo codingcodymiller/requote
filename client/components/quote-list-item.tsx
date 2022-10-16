@@ -3,6 +3,9 @@ import React from 'react';
 export type QuoteData = {
   page: number;
   quoteText: string;
+  quoteId: number;
+  bookTitle: string;
+  bookAuthors: string[];
 }
 
 type SingleQuoteProps = {
@@ -10,16 +13,20 @@ type SingleQuoteProps = {
 }
 
 export default function QuoteListItem(props: SingleQuoteProps){
+  const {quote} = props;
   return (
-    <div className="col-12 col-md-6 col-lg-4 my-2">
-      <div className="card h-100 shadow-sm p-2">
+    <div className="col-12 my-2">
+      <div className="card h-100 shadow-sm p-3 position-relative">
         <div className="row h-100">
-          <div className="col-3 d-flex align-items-center">
-            <img src={book.imageLinks.thumbnail} alt={`${book.title} Book Cover`} className="card book-img rounded-3 shadow-sm" />
-          </div>
-          <div className="col-9 py-2">
-            <h6 className="two-line-truncate">{book.title}</h6>
-            <p className="two-line-truncate">{(book.authors && book.authors.join(', ')) || ''}</p>
+          <div className="col-12">
+            <p className="m-0 preserve-whitespace">"{quote.quoteText}"</p>
+            <div className="row justify-content-end">
+              <div className="col-6 book-info">
+                <p className="m-0 text-end">-{quote.bookAuthors[0]}</p>
+                <p className="m-0 text-end tiny-text two-line-truncate">{quote.bookTitle}</p>
+              </div>
+            </div>
+            <p className="position-absolute top-right tiny-text">{quote.page ? `p.${quote.page}` : ""}</p>
           </div>
         </div>
       </div>
