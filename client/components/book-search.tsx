@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import SearchBar from '../components/search-bar';
-import ResultList from '../components/result-list';
+import SearchBar from './search-bar';
+import ResultList from './result-list';
 
 export default function BookSearch() {
   const [results, updateResults] = useState([]);

@@ -12,7 +12,7 @@ interface SaveQuoteFormControls extends HTMLFormControlsCollection {
 
 export default function SaveQuoteForm() {
   const navigate = useNavigate();
-  const { gBooksId, title } = useContext(SelectedBookContext).data;
+  const { gBooksId, title, authors } = useContext(SelectedBookContext).data;
   if (!gBooksId) return <Navigate to="/save-quote/book-search" />;
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,6 +21,7 @@ export default function SaveQuoteForm() {
       page: formControls.page.value || null,
       quoteText: formControls.quote.value,
       bookTitle: title,
+      bookAuthors: authors,
       gBooksId
     };
     fetch('/api/save', {

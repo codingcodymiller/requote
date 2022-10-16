@@ -37,13 +37,8 @@ export default function SaveQuote() {
   };
   return (
     <SelectedBookContext.Provider value={selectedBook}>
-      <AppHeader />
-      <main className="bg-lavender-grey rounded-border-top main-content">
-        <div className="container">
-          <SectionHeader text="Save Quote" />
-          <Outlet />
-        </div>
-      </main>
+      <SectionHeader text="Save Quote" />
+      <Outlet />
     </SelectedBookContext.Provider>
   );
 }
