@@ -67,6 +67,19 @@
   overflow: hidden;
 }
 
+.top-right {
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.tiny-text {
+  font-size: 0.7rem;
+}
+
+.preserve-whitespace {
+  white-space: pre-wrap;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

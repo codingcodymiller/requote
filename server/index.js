@@ -36,28 +36,28 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, gBooksId, bookTitle } = req.body;
+  const { quoteText, page, gBooksId, bookTitle, bookAuthors } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "gBooksId")
+        ("title", "authors", "gBooksId")
       values
-        ($1, $2)
+        ($1, $2, $3)
       on conflict ("gBooksId")
       do nothing
-      returning "id"
+      returning "bookId"
     ),
     "existingBook" as (
-      select "id" from "books"
-      where "gBooksId" = $2
+      select "bookId" from "books"
+      where "gBooksId" = $3
     )
     insert into "quotes" ("bookId", "page", "quoteText", "userId")
-    select coalesce("existingBook"."id", "book"."id"), $3, $4, $5
+    select coalesce("existingBook"."bookId", "book"."bookId"), $4, $5, $6
     from "book"
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, gBooksId, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, gBooksId, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
@@ -75,6 +75,24 @@ app.get('/api/search/:book', async (req, res) => {
   const response = await fetch(url);
   const bookData = await response.json();
   res.status(200).json(bookData);
+});
+
+app.get('/api/quotes', async (req, res) => {
+  const getQuotes = `
+     select "q"."page",
+            "q"."quoteText",
+            "q"."quoteId",
+            "b"."title" as "bookTitle",
+            "b"."authors" as "bookAuthors"
+       from "quotes" as "q"
+       join "books" as "b" using ("bookId")
+      where "q"."userId" = $1
+   order by "q"."created" desc
+  `;
+  const params = [req.cookies.user_id];
+  const result = await db.query(getQuotes, params);
+  const quoteList = result.rows;
+  res.status(200).json(quoteList);
 });
 
 app.get('/api/login', (req, res) => {
@@ -123,7 +141,7 @@ app.get('/api/auth', async (req, res) => {
   }
   res.cookie('access_token', token)
     .cookie('refresh_token', refreshToken)
-    .cookie('user_id', user.id)
+    .cookie('user_id', user.userId)
     .status(201)
     .redirect('/save-quote/book-search');
 });
