@@ -11,9 +11,9 @@ CREATE TABLE "public"."quotes" (
 	"quoteText" TEXT NOT NULL,
 	"page" integer DEFAULT NULL,
 	"bookId" integer NOT NULL,
-	"id" serial NOT NULL,
+	"quoteId" serial NOT NULL,
 	"userId" integer NOT NULL,
-	CONSTRAINT "quotes_pk" PRIMARY KEY ("id")
+	CONSTRAINT "quotes_pk" PRIMARY KEY ("quoteId")
 ) WITH (
   OIDS=FALSE
 );
@@ -21,11 +21,11 @@ CREATE TABLE "public"."quotes" (
 
 
 CREATE TABLE "public"."books" (
-	"id" serial NOT NULL,
+	"bookId" serial NOT NULL,
 	"title" TEXT NOT NULL,
   "authors" TEXT[],
 	"gBooksId" TEXT UNIQUE NOT NULL,
-	CONSTRAINT "books_pk" PRIMARY KEY ("id")
+	CONSTRAINT "books_pk" PRIMARY KEY ("bookId")
 ) WITH (
   OIDS=FALSE
 );
@@ -33,14 +33,14 @@ CREATE TABLE "public"."books" (
 
 
 CREATE TABLE "public"."users" (
-	"id" serial NOT NULL,
+	"userId" serial NOT NULL,
 	"token" TEXT NOT NULL,
-	CONSTRAINT "users_pk" PRIMARY KEY ("id")
+	CONSTRAINT "users_pk" PRIMARY KEY ("userId")
 ) WITH (
   OIDS=FALSE
 );
 
 
 
-ALTER TABLE "quotes" ADD CONSTRAINT "quotes_fk0" FOREIGN KEY ("bookId") REFERENCES "books"("id");
-ALTER TABLE "quotes" ADD CONSTRAINT "quotes_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id");
+ALTER TABLE "quotes" ADD CONSTRAINT "quotes_fk0" FOREIGN KEY ("bookId") REFERENCES "books"("bookId");
+ALTER TABLE "quotes" ADD CONSTRAINT "quotes_fk1" FOREIGN KEY ("userId") REFERENCES "users"("userId");

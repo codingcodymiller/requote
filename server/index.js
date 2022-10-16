@@ -45,14 +45,14 @@ app.post('/api/save', async (req, res) => {
         ($1, $2, $3)
       on conflict ("gBooksId")
       do nothing
-      returning "id"
+      returning "bookId"
     ),
     "existingBook" as (
-      select "id" from "books"
-      where "gBooksId" = $2
+      select "bookId" from "books"
+      where "gBooksId" = $3
     )
     insert into "quotes" ("bookId", "page", "quoteText", "userId")
-    select coalesce("existingBook"."id", "book"."id"), $4, $5, $6
+    select coalesce("existingBook"."bookId", "book"."bookId"), $4, $5, $6
     from "book"
     full join "existingBook" on true
     returning *
@@ -79,10 +79,15 @@ app.get('/api/search/:book', async (req, res) => {
 
 app.get('/api/quotes', async (req, res) => {
   const getQuotes = `
-    select "page", "quoteText"
-    from "quotes"
-    where "userId" = $1
-    order by "created" desc
+     select "q"."page",
+            "q"."quoteText",
+            "q"."quoteId",
+            "b"."title" as "bookTitle",
+            "b"."authors" as "bookAuthors"
+       from "quotes" as "q"
+       join "books" as "b" using ("bookId")
+      where "q"."userId" = $1
+   order by "q"."created" desc
   `;
   const params = [req.cookies.user_id];
   const result = await db.query(getQuotes, params);
@@ -136,7 +141,7 @@ app.get('/api/auth', async (req, res) => {
   }
   res.cookie('access_token', token)
     .cookie('refresh_token', refreshToken)
-    .cookie('user_id', user.id)
+    .cookie('user_id', user.userId)
     .status(201)
     .redirect('/save-quote/book-search');
 });
