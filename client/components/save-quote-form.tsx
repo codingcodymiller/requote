@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';
@@ -14,12 +14,14 @@ export default function SaveQuoteForm() {
   const navigate = useNavigate();
   const { gBooksId, title, authors } = useContext(SelectedBookContext).data;
   if (!gBooksId) return <Navigate to="/save-quote/book-search" />;
+
+  const [page, updatePage] = useState('');
+  const [quote, updateQuote] = useState('')
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formControls = e.currentTarget.elements as SaveQuoteFormControls;
     const quoteData = {
-      page: formControls.page.value || null,
-      quoteText: formControls.quote.value,
+      page: page || null,
+      quoteText: quote,
       bookTitle: title,
       bookAuthors: authors,
       gBooksId
@@ -47,6 +49,8 @@ export default function SaveQuoteForm() {
         name="page"
         id="page-number"
         placeholder="Ex: 42"
+        value={page}
+        updateValue={updatePage}
       />
       <FormControlLabel
         label="Quote"
@@ -55,6 +59,8 @@ export default function SaveQuoteForm() {
       <FormControlTextArea
         name="quote"
         id="quote"
+        value={quote}
+        updateValue={updateQuote}
         rows={6}
         placeholder="Once upon a midnight dreary..."
         required
