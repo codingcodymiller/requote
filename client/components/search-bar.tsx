@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import FormControlInput from './form-control-input';
 import FormControlLabel from './form-control-label'
 
@@ -7,29 +7,36 @@ interface SearchBarFormControls extends HTMLFormControlsCollection {
 }
 
 type SearchBarProps = {
-  updateResults: React.Dispatch<React.SetStateAction<never[]>>;
+  label?: string;
+  placeholder: string;
+  handleSearchSubmit: (searchTerm: string) => void;
 }
 
 export default function SearchBar(props: SearchBarProps) {
+  const { placeholder, label } = props;
+  const [searchTerm, updateSearchTerm] = useState('')
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-    const formControls = event.currentTarget.elements as SearchBarFormControls;
     event.preventDefault();
-    fetch(`/api/search/${formControls.search.value}`)
-      .then(res => res.json())
-      .then(res => props.updateResults(res.items));
+    props.handleSearchSubmit(searchTerm)
   };
   return (
     <form onSubmit={handleSearchSubmit}>
-      <FormControlLabel
-        label="Book Title"
-        id="search-bar"
-      />
+      {
+        label ?
+        <FormControlLabel
+          label={label}
+          id="search-bar"
+        /> :
+        ""
+      }
       <div className="position-relative col-12">
         <FormControlInput
           type="text"
           name="search"
           id="search-bar"
-          placeholder="Ex: The Hobbit"
+          placeholder={placeholder}
+          value={searchTerm}
+          updateValue={updateSearchTerm}
         />
         <button className="position-absolute translate-middle-y end-0 top-50 mx-3 border-0 bg-transparent">
           <i className="fa-solid fa-magnifying-glass"></i>

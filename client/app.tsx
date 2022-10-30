@@ -9,7 +9,7 @@ import Library from './pages/library';
 import BookSearch from './components/book-search';
 import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
-import Quotes from './pages/quotes'
+import QuoteDashboard from './pages/quote-dashboard'
 
 export default function App() {
   return (
@@ -24,7 +24,7 @@ export default function App() {
               <Route path="book-search" element={<BookSearch />} />
               <Route path="form" element={<SaveQuoteForm />} />
             </Route>
-            <Route path="/quotes" element={<Quotes />}/>
+            <Route path="/quotes" element={<QuoteDashboard />}/>
           </Routes>
         </div>
       </main>

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 require('dotenv/config');
+
 const pg = require('pg');
 const path = require('path');
 const express = require('express');
@@ -7,6 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
+// const { determineSortOrder } = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -51,8 +53,8 @@ app.post('/api/save', async (req, res) => {
       select "bookId" from "books"
       where "gBooksId" = $3
     )
-    insert into "quotes" ("bookId", "page", "quoteText", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $4, $5, $6
+    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
+    select coalesce("existingBook"."bookId", "book"."bookId"), $4, $5, to_tsvector($5), $6
     from "book"
     full join "existingBook" on true
     returning *
@@ -90,6 +92,26 @@ app.get('/api/quotes', async (req, res) => {
    order by "q"."created" desc
   `;
   const params = [req.cookies.user_id];
+  const result = await db.query(getQuotes, params);
+  const quoteList = result.rows;
+  res.status(200).json(quoteList);
+});
+
+app.post('/api/quotes', async (req, res) => {
+  const { searchTerm } = req.body;
+  const getQuotes = `
+     select "q"."page",
+            "q"."quoteText",
+            "q"."quoteId",
+            "b"."title" as "bookTitle",
+            "b"."authors" as "bookAuthors"
+       from "quotes" as "q"
+       join "books" as "b" using ("bookId")
+      where "q"."userId" = $1
+        and "q"."quoteVector" @@ to_tsquery($2)
+   order by "q"."created" desc
+  `;
+  const params = [req.cookies.user_id, searchTerm];
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
   res.status(200).json(quoteList);
