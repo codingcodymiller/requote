@@ -7,10 +7,13 @@ interface SearchBarFormControls extends HTMLFormControlsCollection {
 }
 
 type SearchBarProps = {
+  label?: string;
+  placeholder: string;
   handleSearchSubmit: (searchTerm: string) => void;
 }
 
 export default function SearchBar(props: SearchBarProps) {
+  const { placeholder, label } = props;
   const [searchTerm, updateSearchTerm] = useState('')
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,16 +21,20 @@ export default function SearchBar(props: SearchBarProps) {
   };
   return (
     <form onSubmit={handleSearchSubmit}>
-      <FormControlLabel
-        label="Book Title"
-        id="search-bar"
-      />
+      {
+        label ?
+        <FormControlLabel
+          label={label}
+          id="search-bar"
+        /> :
+        ""
+      }
       <div className="position-relative col-12">
         <FormControlInput
           type="text"
           name="search"
           id="search-bar"
-          placeholder="Ex: The Hobbit"
+          placeholder={placeholder}
           value={searchTerm}
           updateValue={updateSearchTerm}
         />

@@ -11,7 +11,7 @@ export default function BookSearch() {
   }
   return (
     <>
-      <SearchBar handleSearchSubmit={searchBooks} />
+      <SearchBar label="Book Title" placeholder="Ex: The Hobbit" handleSearchSubmit={searchBooks} />
       <ResultList results={results} />
     </>
   );

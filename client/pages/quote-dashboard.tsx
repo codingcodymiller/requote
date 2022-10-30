@@ -1,16 +1,13 @@
 import React from 'react';
 
-import QuoteList from '../components/quote-list'
 import {QuoteData} from '../components/quote-list-item';
+import QuoteSearch from '../components/quote-search';
+import QuoteList from '../components/quote-list'
 import SectionHeader from '../components/section-header'
 
 type QuotesState = {
   searchTerm: null | string;
   quoteList: QuoteData[];
-}
-
-type QuoteSearchBody = {
-  searchTerm: string;
 }
 
 export default class QuoteDashboard extends React.Component {
@@ -31,21 +28,6 @@ export default class QuoteDashboard extends React.Component {
     });
   }
 
-  searchQuotes(searchTerm: string){
-    const reqBody: QuoteSearchBody = { searchTerm };
-    fetch(
-      `/api/quotes`,
-      {
-        method: "POST",
-        body: JSON.stringify(reqBody)
-      }
-    )
-    .then(res => res.json())
-    .then(res => {
-      this.updateQuoteList(res)
-    });
-  }
-
   updateQuoteList(quoteList: QuoteData[]){
     this.setState({ quoteList })
   }
@@ -54,6 +36,7 @@ export default class QuoteDashboard extends React.Component {
     return (
       <>
         <SectionHeader text="Quotes" />
+        <QuoteSearch updateQuoteList={this.updateQuoteList.bind(this)}/>
         <QuoteList quotes={this.state.quoteList} />
       </>
     )
