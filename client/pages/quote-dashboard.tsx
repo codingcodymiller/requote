@@ -7,7 +7,7 @@ import QuoteList from '../components/quote-list'
 import SectionHeader from '../components/section-header'
 
 type QuotesState = {
-  searchTerm: null | string;
+  searchTerm: string;
   sortType: string;
   isReversed: boolean;
   quoteList: QuoteData[];
@@ -15,7 +15,7 @@ type QuotesState = {
 
 export default class QuoteDashboard extends React.Component {
   state: QuotesState = {
-    searchTerm: null,
+    searchTerm: '',
     sortType: "date",
     isReversed: false,
     quoteList: []
@@ -40,7 +40,7 @@ export default class QuoteDashboard extends React.Component {
   }
 
   updateSortType(sortData: SortStateUpdate){
-    this.setState(sortData);
+    this.setState(sortData, this.getQuotes);
   }
 
   render(){
