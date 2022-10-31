@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-// const { determineSortOrder } = require('./helpers');
+const { determineSortOrder, determineSortType } = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -80,6 +80,9 @@ app.get('/api/search/:book', async (req, res) => {
 });
 
 app.get('/api/quotes', async (req, res) => {
+  const { sort, order } = req.query;
+  const sortOrder = determineSortOrder(order);
+  const sortType = determineSortType(sort);
   const getQuotes = `
      select "q"."page",
             "q"."quoteText",
@@ -89,7 +92,7 @@ app.get('/api/quotes', async (req, res) => {
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1
-   order by "q"."created" desc
+   order by ${sortType} ${sortOrder}
   `;
   const params = [req.cookies.user_id];
   const result = await db.query(getQuotes, params);
@@ -99,6 +102,9 @@ app.get('/api/quotes', async (req, res) => {
 
 app.post('/api/quotes', async (req, res) => {
   const { searchTerm } = req.body;
+  const { sort, order } = req.query;
+  const sortOrder = determineSortOrder(order);
+  const sortType = determineSortType(sort);
   const getQuotes = `
      select "q"."page",
             "q"."quoteText",
@@ -109,7 +115,7 @@ app.post('/api/quotes', async (req, res) => {
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1
         and "q"."quoteVector" @@ to_tsquery($2)
-   order by "q"."created" desc
+   order by ${sortType} ${sortOrder}
   `;
   const params = [req.cookies.user_id, searchTerm];
   const result = await db.query(getQuotes, params);

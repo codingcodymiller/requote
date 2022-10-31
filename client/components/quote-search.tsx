@@ -1,48 +1,27 @@
 import React from 'react';
 import SearchBar from './search-bar';
-import { QuoteData } from '../components/quote-list-item';
-
-type QuoteSearchBody = {
-  searchTerm: string;
-}
+import QuoteSort from './quote-sort'
+import { SortStateUpdate } from '../pages/quote-dashboard'
 
 type QuoteSearchProps = {
-  updateQuoteList: (quoteList: QuoteData[]) => void;
-}
-
-type RequestHeaders = {
-  "Content-Type": string;
-}
-
-type RequestConfig = {
-  method: string;
-  headers?: RequestHeaders,
-  body?: string;
+  sortType: string;
+  isReversed: boolean;
+  updateSearchTerm: (searchTerm: string) => void;
+  updateSortType: (sortData: SortStateUpdate) => void;
 }
 
 export default function QuoteSearch (props: QuoteSearchProps) {
-  const searchQuotes = (searchTerm: string) => {
-    let config: RequestConfig = {
-      method: "get"
-    }
-    if(searchTerm){
-      const reqBody: QuoteSearchBody = { searchTerm };
-      config = {
-        method: "post",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(reqBody)
-      }
-    }
-    fetch(`/api/quotes`, config)
-    .then(res => res.json())
-    .then(res => {
-      props.updateQuoteList(res)
-    });
-  }
-
+  const { sortType, isReversed, updateSortType, updateSearchTerm } = props;
   return (
-    <SearchBar handleSearchSubmit={searchQuotes} placeholder="" />
+    <div className="row justify-content-evenly align-items-center">
+      <div className="col-10 col-xs-11 pe-0">
+        <div className="row">
+          <SearchBar handleSearchSubmit={updateSearchTerm} placeholder="Search..." />
+        </div>
+      </div>
+      <div className="col-2 col-xs-1 px-1">
+        <QuoteSort sortType={sortType} isReversed={isReversed} updateSortType={updateSortType} />
+      </div>
+    </div>
   )
 }
