@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {QuoteData} from '../components/quote-list-item';
-import { SortStateUpdate } from '../components/quote-search';
 import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list'
 import SectionHeader from '../components/section-header'
@@ -11,6 +10,25 @@ type QuotesState = {
   sortType: string;
   isReversed: boolean;
   quoteList: QuoteData[];
+}
+
+type QuoteSearchBody = {
+  searchTerm: string;
+}
+
+type RequestHeaders = {
+  "Content-Type": string;
+}
+
+type RequestConfig = {
+  method: string;
+  headers?: RequestHeaders,
+  body?: string;
+}
+
+export type SortStateUpdate = {
+  sortType?: string;
+  isReversed?: boolean;
 }
 
 export default class QuoteDashboard extends React.Component {
@@ -26,9 +44,24 @@ export default class QuoteDashboard extends React.Component {
   }
 
   getQuotes(){
+    const { searchTerm } = this.state;
+    let config: RequestConfig = {
+      method: "get"
+    }
+    if (searchTerm) {
+      const reqBody: QuoteSearchBody = { searchTerm };
+      config = {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reqBody)
+      }
+    }
+
     const { sortType, isReversed } = this.state;
     const order = isReversed ? "ascending" : "descending";
-    fetch(`/api/quotes?sort=${sortType}&order=${order}`)
+    fetch(`/api/quotes?sort=${sortType}&order=${order}`, config)
     .then(res => res.json())
     .then(res => {
       this.updateQuoteList(res)
@@ -43,6 +76,10 @@ export default class QuoteDashboard extends React.Component {
     this.setState(sortData, this.getQuotes);
   }
 
+  updateSearchTerm(searchTerm: QuoteSearchBody){
+    this.setState({ searchTerm }, this.getQuotes)
+  }
+
   render(){
     return (
       <>
@@ -50,8 +87,8 @@ export default class QuoteDashboard extends React.Component {
         <QuoteSearch
           sortType={this.state.sortType}
           isReversed={this.state.isReversed}
-          updateQuoteList={this.updateQuoteList.bind(this)}
           updateSortType={this.updateSortType.bind(this)}
+          updateSearchTerm={this.updateSearchTerm.bind(this)}
         />
         <QuoteList quotes={this.state.quoteList} />
       </>
