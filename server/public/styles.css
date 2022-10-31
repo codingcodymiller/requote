@@ -91,3 +91,18 @@
 .hover-grow:hover {
   transform: scale(1.01);
 }
+
+.fill-area {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.z-index-10 {
+  z-index: 10;
+}
+
+.bg-shadow {
+  background-color: rgba(0, 0, 0, 0.4);
+}
