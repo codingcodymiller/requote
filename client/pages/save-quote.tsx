@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import SectionHeader from '../components/section-header';
-import AppHeader from '../components/app-header';
 
 export const SelectedBookContext = React.createContext<BookDataContextValue>({} as BookDataContextValue);
 
@@ -9,10 +8,8 @@ export type BookData = {
   title: string;
   authors: string[];
   detailsUrl: string;
+  imageUrl: string;
   gBooksId: string;
-  imageLinks: {
-    thumbnail: string;
-  }
 }
 
 export type BookDataContextValue = {
@@ -24,9 +21,7 @@ export default function SaveQuote() {
   const selectedBook = {
     data: {
       title: '',
-      imageLinks: {
-        thumbnail: ''
-      },
+      imageUrl: '',
       authors: [''],
       detailsUrl: '',
       gBooksId: ''

@@ -1,36 +1,30 @@
 import React from 'react';
 import BookListItem from './book-list-item';
 
-import { BookData } from '../pages/save-quote'
-
 type VolumeData = {
-  imageLinks?: {
+  imageLinks: {
     thumbnail: string;
   };
   title: string;
   authors: string[];
 }
 
-interface UnsanitizedBookData {
+export type GoogleBookData = {
   volumeInfo: VolumeData
   id: string;
   selfLink: string;
 }
 
-interface SanitizedBookData extends Omit<UnsanitizedBookData, 'volumeInfo'> {
-  volumeInfo: Required<VolumeData>
-}
-
 type ResultsListProps = {
-  results: UnsanitizedBookData[]
+  results: GoogleBookData[]
 }
 
 export default function ResultList(props: ResultsListProps) {
   if (!props.results.length) return <></>;
 
   const results = props.results
-    .filter(({ volumeInfo }: UnsanitizedBookData) => volumeInfo.imageLinks)
-    .map(({ volumeInfo: bookData, id: gBooksId, selfLink: detailsUrl }: SanitizedBookData) => <BookListItem book={{ ...bookData, gBooksId, detailsUrl }} key={gBooksId} />);
+    .filter(({ volumeInfo }: GoogleBookData) => volumeInfo.imageLinks)
+    .map((book: GoogleBookData) => <BookListItem book={book} key={book.id} />);
 
   return (
     <div className="row">
