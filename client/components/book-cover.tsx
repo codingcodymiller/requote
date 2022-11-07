@@ -14,7 +14,7 @@ export default function BookCover(props: BookData){
     navigate(`/quotes/${props.id}`, { replace: false });
   }
   return (
-    <div className="col-6 col-sm-3 rounded" onClick={showQuotes}>
+    <div className="col-6 col-sm-3 my-2 cursor-pointer hover-grow" onClick={showQuotes}>
       <img src={props.imageUrl} alt={props.title} className="w-100 h-100 book-cover" />
     </div>
   )
