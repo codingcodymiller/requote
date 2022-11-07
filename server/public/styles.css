@@ -59,6 +59,13 @@
   object-position: top;
 }
 
+.book-cover {
+  width: 100%;
+  aspect-ratio: 1/1.5;
+  object-fit: cover;
+  object-position: top;
+}
+
 .two-line-truncate {
   /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;

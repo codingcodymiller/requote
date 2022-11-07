@@ -137,7 +137,7 @@ app.get('/api/books', async (req, res) => {
   const getBooks = `
      select "b"."title",
             "b"."imageUrl",
-            "b"."bookId"
+            "b"."bookId" as "id"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1
