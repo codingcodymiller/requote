@@ -24,7 +24,8 @@ export default function App() {
               <Route path="book-search" element={<BookSearch />} />
               <Route path="form" element={<SaveQuoteForm />} />
             </Route>
-            <Route path="/quotes" element={<QuoteDashboard />}/>
+            <Route path="/quotes" element={<QuoteDashboard />} />
+            <Route path="/quotes/:bookId" element={<QuoteDashboard />}/>
           </Routes>
         </div>
       </main>

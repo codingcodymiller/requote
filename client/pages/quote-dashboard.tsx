@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { RouteProps } from 'react-router-dom';
 import {QuoteData} from '../components/quote-list-item';
 import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list'
@@ -27,12 +27,17 @@ type RequestConfig = {
 }
 
 export type SortStateUpdate = {
-  sortType?: string;
-  isReversed?: boolean;
+  sortType: string;
 }
 
-export default class QuoteDashboard extends React.Component {
-  state: QuotesState = {
+export type ReversedStateUpdate = {
+  isReversed: boolean;
+}
+
+interface Props { match?: { params: { bookId: string; }; }; }
+
+export default class QuoteDashboard extends React.Component<Props, QuotesState> {
+  state = {
     searchTerm: '',
     sortType: "date",
     isReversed: false,
@@ -61,7 +66,8 @@ export default class QuoteDashboard extends React.Component {
 
     const { sortType, isReversed } = this.state;
     const order = isReversed ? "ascending" : "descending";
-    fetch(`/api/quotes?sort=${sortType}&order=${order}`, config)
+    const bookId = this.props.match?.params.bookId;
+    fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}`, config)
     .then(res => res.json())
     .then(res => {
       this.updateQuoteList(res)
@@ -72,11 +78,11 @@ export default class QuoteDashboard extends React.Component {
     this.setState({ quoteList })
   }
 
-  updateSortType(sortData: SortStateUpdate){
-    this.setState(sortData, this.getQuotes);
+  updateSortType(sortData: SortStateUpdate | ReversedStateUpdate){
+    this.setState({...this.state, ...sortData}, this.getQuotes);
   }
 
-  updateSearchTerm(searchTerm: QuoteSearchBody){
+  updateSearchTerm({ searchTerm }: QuoteSearchBody){
     this.setState({ searchTerm }, this.getQuotes)
   }
 

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { SortStateUpdate } from '../pages/quote-dashboard';
+import { SortStateUpdate, ReversedStateUpdate } from '../pages/quote-dashboard';
 
 type SortProps = {
   sortType: string;
   isReversed: boolean;
-  updateSortType: (sort: SortStateUpdate) => void;
+  updateSortType: (sort: SortStateUpdate | ReversedStateUpdate) => void;
 }
 
 export default function QuoteSort (props: SortProps){
