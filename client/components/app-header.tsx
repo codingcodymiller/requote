@@ -24,14 +24,14 @@ export default function AppHeader() {
             Quotes
           </Link>
         </nav>
-        <nav className="col-12 d-flex justify-content-center align-items-center d-md-none mobile-nav">
+        <nav className="col-12 d-flex justify-content-evenly align-items-center d-md-none mobile-nav">
           <Link to="/save-quote/book-search" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-solid fa-pen-clip fa-xl"></i>
             <span className="text-small">Save Quote</span>
           </Link>
           <Link to="/library" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-solid fa-book fa-xl"></i>
-            <span className="text-small">Save Quote</span>
+            <span className="text-small">Library</span>
           </Link>
           <Link to="/quotes" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-regular fa-comment fa-xl"></i>
