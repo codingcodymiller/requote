@@ -7,8 +7,8 @@ import { SelectedBookContext } from '../pages/save-quote';
 
 export default function SaveQuoteForm() {
   const navigate = useNavigate();
-  const { gBooksId, title, authors, imageUrl } = useContext(SelectedBookContext).data;
-  if (!gBooksId) return <Navigate to="/save-quote/book-search" />;
+  const { isbn, title, authors, image } = useContext(SelectedBookContext).data;
+  if (!isbn) return <Navigate to="/save-quote/book-search" />;
 
   const [page, updatePage] = useState('');
   const [quote, updateQuote] = useState('')
@@ -19,8 +19,8 @@ export default function SaveQuoteForm() {
       quoteText: quote,
       bookTitle: title,
       bookAuthors: authors,
-      bookImage: imageUrl,
-      gBooksId
+      bookImage: image,
+      isbn
     };
     fetch('/api/save', {
       method: 'post',

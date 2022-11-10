@@ -25,8 +25,8 @@ CREATE TABLE "public"."books" (
 	"bookId" serial NOT NULL,
 	"title" TEXT NOT NULL,
   "authors" TEXT[],
-  "imageUrl" TEXT NOT NULL,
-	"gBooksId" TEXT UNIQUE NOT NULL,
+  "image" TEXT NOT NULL,
+	"isbn" TEXT UNIQUE NOT NULL,
 	CONSTRAINT "books_pk" PRIMARY KEY ("bookId")
 ) WITH (
   OIDS=FALSE

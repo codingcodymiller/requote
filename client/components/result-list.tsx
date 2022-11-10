@@ -1,30 +1,15 @@
 import React from 'react';
 import BookListItem from './book-list-item';
-
-type VolumeData = {
-  imageLinks: {
-    thumbnail: string;
-  };
-  title: string;
-  authors: string[];
-}
-
-export type GoogleBookData = {
-  volumeInfo: VolumeData
-  id: string;
-  selfLink: string;
-}
+import { BookData } from '../pages/save-quote'
 
 type ResultsListProps = {
-  results: GoogleBookData[]
+  results: BookData[]
 }
 
 export default function ResultList(props: ResultsListProps) {
   if (!props.results.length) return <></>;
 
-  const results = props.results
-    .filter(({ volumeInfo }: GoogleBookData) => volumeInfo.imageLinks)
-    .map((book: GoogleBookData) => <BookListItem book={book} key={book.id} />);
+  const results = props.results.map((book: BookData) => <BookListItem book={book} key={book.isbn} />);
 
   return (
     <div className="row">

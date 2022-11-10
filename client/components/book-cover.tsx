@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export type BookData = {
   id: number;
-  imageUrl: string;
+  image: string;
   title: string;
 }
 
@@ -15,7 +15,7 @@ export default function BookCover(props: BookData){
   }
   return (
     <div className="col-6 col-sm-3 my-2 cursor-pointer hover-grow" onClick={showQuotes}>
-      <img src={props.imageUrl} alt={props.title} className="w-100 h-100 book-cover" />
+      <img src={props.image} alt={props.title} className="w-100 h-100 book-cover" />
     </div>
   )
 }

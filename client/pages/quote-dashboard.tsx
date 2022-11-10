@@ -21,14 +21,15 @@ type RequestConfig = {
 interface Props { match?: { params: { bookId: string; }; }; }
 
 export default function QuoteDashboard (props: Props) {
-  const [isMounted, updateIsMounted] = useState(true);
   const [searchTerm, updateSearchTerm] = useState('');
   const [sortType, updateSortType] = useState('date');
   const [isReversed, updateIsReversed] = useState(false);
   const [quoteList, updateQuoteList] = useState([]);
   const { bookId } = useParams();
 
-  const getQuotes = () => {
+  useEffect(() => {
+    let isComponentMounted = true;
+
     let config: RequestConfig = {
       method: "get"
     }
@@ -43,17 +44,15 @@ export default function QuoteDashboard (props: Props) {
       }
     }
     const order = isReversed ? "ascending" : "descending";
+
     fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}`, config)
     .then(res => res.json())
     .then(res => {
-      if(!isMounted) return;
+      if (!isComponentMounted) return;
       updateQuoteList(res)
     });
-  }
 
-  useEffect(() => {
-    getQuotes();
-    return () => updateIsMounted(false)
+    return () => { isComponentMounted = false }
   })
 
   return (

@@ -38,20 +38,20 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, gBooksId, bookTitle, bookAuthors, bookImage } = req.body;
+  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "imageUrl", "gBooksId")
+        ("title", "authors", "image", "isbn")
       values
         ($1, $2, $3, $4)
-      on conflict ("gBooksId")
+      on conflict ("isbn")
       do nothing
       returning "bookId"
     ),
     "existingBook" as (
       select "bookId" from "books"
-      where "gBooksId" = $4
+      where "isbn" = $4
     )
     insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
     select coalesce("existingBook"."bookId", "book"."bookId"), $5, $6, to_tsvector($6), $7
@@ -59,24 +59,22 @@ app.post('/api/save', async (req, res) => {
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, gBooksId, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, bookImage, isbn, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
 });
 
 app.get('/api/search/:book', async (req, res) => {
-  const queryParams = [
-    'orderBy=relevance',
-    'printType=books',
-    'projection=lite',
-    'maxResults=40',
-    `q=${req.params.book}`
-  ];
-  const url = 'https://www.googleapis.com/books/v1/volumes?' + queryParams.join('&');
-  const response = await fetch(url);
+  const url = `https://api2.isbndb.com/books/${req.params.book}`;
+  const config = {
+    headers: {
+      Authorization: process.env.ISBNDB_KEY
+    }
+  };
+  const response = await fetch(url, config);
   const bookData = await response.json();
-  res.status(200).json(bookData);
+  res.status(200).json(bookData.books || []);
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
@@ -136,7 +134,7 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
 app.get('/api/books', async (req, res) => {
   const getBooks = `
      select "b"."title",
-            "b"."imageUrl",
+            "b"."image",
             "b"."bookId" as "id"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")

@@ -7,9 +7,8 @@ export const SelectedBookContext = React.createContext<BookDataContextValue>({} 
 export type BookData = {
   title: string;
   authors: string[];
-  detailsUrl: string;
-  imageUrl: string;
-  gBooksId: string;
+  image: string;
+  isbn: string;
 }
 
 export type BookDataContextValue = {
@@ -21,10 +20,9 @@ export default function SaveQuote() {
   const selectedBook = {
     data: {
       title: '',
-      imageUrl: '',
+      image: '',
       authors: [''],
-      detailsUrl: '',
-      gBooksId: ''
+      isbn: ''
     },
     setBookData: function (book: BookData) {
       this.data = book;
