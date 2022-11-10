@@ -5,15 +5,10 @@ import FormControlTextArea from './form-control-textarea';
 import FormControlLabel from './form-control-label';
 import { SelectedBookContext } from '../pages/save-quote';
 
-interface SaveQuoteFormControls extends HTMLFormControlsCollection {
-  page: HTMLInputElement;
-  quote: HTMLTextAreaElement;
-}
-
 export default function SaveQuoteForm() {
   const navigate = useNavigate();
-  const { gBooksId, title, authors } = useContext(SelectedBookContext).data;
-  if (!gBooksId) return <Navigate to="/save-quote/book-search" />;
+  const { isbn, title, authors, image } = useContext(SelectedBookContext).data;
+  if (!isbn) return <Navigate to="/save-quote/book-search" />;
 
   const [page, updatePage] = useState('');
   const [quote, updateQuote] = useState('')
@@ -24,7 +19,8 @@ export default function SaveQuoteForm() {
       quoteText: quote,
       bookTitle: title,
       bookAuthors: authors,
-      gBooksId
+      bookImage: image,
+      isbn
     };
     fetch('/api/save', {
       method: 'post',

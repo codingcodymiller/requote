@@ -38,51 +38,52 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, gBooksId, bookTitle, bookAuthors } = req.body;
+  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "gBooksId")
+        ("title", "authors", "image", "isbn")
       values
-        ($1, $2, $3)
-      on conflict ("gBooksId")
+        ($1, $2, $3, $4)
+      on conflict ("isbn")
       do nothing
       returning "bookId"
     ),
     "existingBook" as (
       select "bookId" from "books"
-      where "gBooksId" = $3
+      where "isbn" = $4
     )
     insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $4, $5, to_tsvector($5), $6
+    select coalesce("existingBook"."bookId", "book"."bookId"), $5, $6, to_tsvector($6), $7
     from "book"
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, bookAuthors, gBooksId, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, bookImage, isbn, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
 });
 
 app.get('/api/search/:book', async (req, res) => {
-  const queryParams = [
-    'orderBy=relevance',
-    'printType=books',
-    'projection=lite',
-    'maxResults=40',
-    `q=${req.params.book}`
-  ];
-  const url = 'https://www.googleapis.com/books/v1/volumes?' + queryParams.join('&');
-  const response = await fetch(url);
+  const url = `https://api2.isbndb.com/books/${req.params.book}`;
+  const config = {
+    headers: {
+      Authorization: process.env.ISBNDB_KEY
+    }
+  };
+  const response = await fetch(url, config);
   const bookData = await response.json();
-  res.status(200).json(bookData);
+  res.status(200).json(bookData.books || []);
 });
 
-app.get('/api/quotes', async (req, res) => {
+app.get('/api/quotes/:bookId?', async (req, res) => {
   const { sort, order } = req.query;
+  const { bookId } = req.params;
   const sortOrder = determineSortOrder(order);
   const sortType = determineSortType(sort);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $2' : '';
+
   const getQuotes = `
      select "q"."page",
             "q"."quoteText",
@@ -91,20 +92,25 @@ app.get('/api/quotes', async (req, res) => {
             "b"."authors" as "bookAuthors"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
-      where "q"."userId" = $1
+      where "q"."userId" = $1 ${specificBookCondition}
    order by ${sortType} ${sortOrder}
   `;
   const params = [req.cookies.user_id];
+  if (bookId) params.push(bookId);
+
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
   res.status(200).json(quoteList);
 });
 
-app.post('/api/quotes', async (req, res) => {
+app.post('/api/quotes/:bookId?', async (req, res) => {
   const { searchTerm } = req.body;
   const { sort, order } = req.query;
+  const { bookId } = req.params;
   const sortOrder = determineSortOrder(order);
   const sortType = determineSortType(sort);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $3' : '';
+
   const getQuotes = `
      select "q"."page",
             "q"."quoteText",
@@ -113,14 +119,32 @@ app.post('/api/quotes', async (req, res) => {
             "b"."authors" as "bookAuthors"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
-      where "q"."userId" = $1
+      where "q"."userId" = $1 ${specificBookCondition}
         and "q"."quoteVector" @@ to_tsquery($2)
    order by ${sortType} ${sortOrder}
   `;
   const params = [req.cookies.user_id, searchTerm];
+  if (bookId) params.push(bookId);
+
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
   res.status(200).json(quoteList);
+});
+
+app.get('/api/books', async (req, res) => {
+  const getBooks = `
+     select "b"."title",
+            "b"."image",
+            "b"."bookId" as "id"
+       from "quotes" as "q"
+       join "books" as "b" using ("bookId")
+      where "q"."userId" = $1
+   order by "b"."title" asc
+  `;
+  const params = [req.cookies.user_id];
+  const result = await db.query(getBooks, params);
+  const bookList = result.rows;
+  res.status(200).json(bookList);
 });
 
 app.get('/api/login', (req, res) => {
@@ -171,7 +195,7 @@ app.get('/api/auth', async (req, res) => {
     .cookie('refresh_token', refreshToken)
     .cookie('user_id', user.userId)
     .status(201)
-    .redirect('/save-quote/book-search');
+    .redirect('/library');
 });
 
 app.get('/api/*', function (req, res) {

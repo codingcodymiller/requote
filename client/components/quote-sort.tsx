@@ -1,24 +1,18 @@
 import React, { useState } from "react";
-import { SortStateUpdate } from '../pages/quote-dashboard';
 
 type SortProps = {
   sortType: string;
   isReversed: boolean;
-  updateSortType: (sort: SortStateUpdate) => void;
+  updateSortType: (sortType: string) => void;
+  updateIsReversed: (isReversed: boolean) => void;
 }
 
 export default function QuoteSort (props: SortProps){
-  const { sortType, isReversed, updateSortType } = props;
+  const { sortType, isReversed, updateSortType, updateIsReversed } = props;
   const [modalShown, toggleModal] = useState(false);
-  const reverseList = () => {
-    updateSortType({
-      isReversed: !isReversed
-    })
-  }
+  const reverseList = () => updateIsReversed(!isReversed)
   const handleSortSelected = (e: { target: { value: string; }; }) => {
-    updateSortType({
-      sortType: e.target.value
-    })
+    updateSortType(e.target.value)
     toggleModal(!modalShown)
   }
   return (

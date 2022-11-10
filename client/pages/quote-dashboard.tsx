@@ -1,16 +1,8 @@
-import React from 'react';
-
-import {QuoteData} from '../components/quote-list-item';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list'
 import SectionHeader from '../components/section-header'
-
-type QuotesState = {
-  searchTerm: string;
-  sortType: string;
-  isReversed: boolean;
-  quoteList: QuoteData[];
-}
 
 type QuoteSearchBody = {
   searchTerm: string;
@@ -26,25 +18,18 @@ type RequestConfig = {
   body?: string;
 }
 
-export type SortStateUpdate = {
-  sortType?: string;
-  isReversed?: boolean;
-}
+interface Props { match?: { params: { bookId: string; }; }; }
 
-export default class QuoteDashboard extends React.Component {
-  state: QuotesState = {
-    searchTerm: '',
-    sortType: "date",
-    isReversed: false,
-    quoteList: []
-  }
+export default function QuoteDashboard (props: Props) {
+  const [searchTerm, updateSearchTerm] = useState('');
+  const [sortType, updateSortType] = useState('date');
+  const [isReversed, updateIsReversed] = useState(false);
+  const [quoteList, updateQuoteList] = useState([]);
+  const { bookId } = useParams();
 
-  componentDidMount(){
-    this.getQuotes();
-  }
+  useEffect(() => {
+    let isComponentMounted = true;
 
-  getQuotes(){
-    const { searchTerm } = this.state;
     let config: RequestConfig = {
       method: "get"
     }
@@ -58,40 +43,29 @@ export default class QuoteDashboard extends React.Component {
         body: JSON.stringify(reqBody)
       }
     }
-
-    const { sortType, isReversed } = this.state;
     const order = isReversed ? "ascending" : "descending";
-    fetch(`/api/quotes?sort=${sortType}&order=${order}`, config)
+
+    fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}`, config)
     .then(res => res.json())
     .then(res => {
-      this.updateQuoteList(res)
+      if (!isComponentMounted) return;
+      updateQuoteList(res)
     });
-  }
 
-  updateQuoteList(quoteList: QuoteData[]){
-    this.setState({ quoteList })
-  }
+    return () => { isComponentMounted = false }
+  })
 
-  updateSortType(sortData: SortStateUpdate){
-    this.setState(sortData, this.getQuotes);
-  }
-
-  updateSearchTerm(searchTerm: QuoteSearchBody){
-    this.setState({ searchTerm }, this.getQuotes)
-  }
-
-  render(){
-    return (
-      <>
-        <SectionHeader text="Quotes" />
-        <QuoteSearch
-          sortType={this.state.sortType}
-          isReversed={this.state.isReversed}
-          updateSortType={this.updateSortType.bind(this)}
-          updateSearchTerm={this.updateSearchTerm.bind(this)}
-        />
-        <QuoteList quotes={this.state.quoteList} />
-      </>
-    )
-  }
+  return (
+    <>
+      <SectionHeader text="Quotes" />
+      <QuoteSearch
+        sortType={sortType}
+        isReversed={isReversed}
+        updateSortType={updateSortType}
+        updateIsReversed={updateIsReversed}
+        updateSearchTerm={updateSearchTerm}
+      />
+      <QuoteList quotes={quoteList} />
+    </>
+  )
 }
