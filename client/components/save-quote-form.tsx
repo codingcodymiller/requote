@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
+import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';
 import FormControlLabel from './form-control-label';
@@ -48,6 +49,7 @@ export default function SaveQuoteForm() {
         value={page}
         updateValue={updatePage}
       />
+      <DropZone updateQuote={updateQuote} />
       <FormControlLabel
         label="Quote"
         id="quote"
