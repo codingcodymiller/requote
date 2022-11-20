@@ -74,7 +74,8 @@ app.get('/api/search/:book', async (req, res) => {
   };
   const response = await fetch(url, config);
   const bookData = await response.json();
-  res.status(200).json(bookData.books || []);
+  bookData.books = bookData.books ? bookData.books.filter(book => book.authors) : [];
+  res.status(200).json(bookData.books);
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
