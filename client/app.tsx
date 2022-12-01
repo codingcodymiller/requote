@@ -10,6 +10,7 @@ import BookSearch from './components/book-search';
 import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
 import QuoteDashboard from './pages/quote-dashboard'
+import BookDetails from './pages/book-details';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             </Route>
             <Route path="/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes/:bookId" element={<QuoteDashboard />}/>
+            <Route path="/book-details/:isbn" element={<BookDetails />}></Route>
           </Routes>
         </div>
       </main>

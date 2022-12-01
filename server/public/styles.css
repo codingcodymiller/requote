@@ -81,8 +81,13 @@
 }
 
 .top-right {
-  top: 0.25rem;
-  right: 0.25rem;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.top-right-lg {
+  top: 1rem;
+  right: 1.25rem;
 }
 
 .tiny-text {
@@ -132,4 +137,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.left {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 1rem;
 }

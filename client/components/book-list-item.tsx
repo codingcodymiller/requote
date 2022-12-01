@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BookDetailsIcon from './book-details-icon';
 import { SelectedBookContext, BookDataContextValue, BookData } from '../pages/save-quote';
 
 type SingleBookProps = {
@@ -17,9 +18,10 @@ export default function BookListItem(props: SingleBookProps) {
       selectedBookData.setBookData(book);
       navigate('/save-quote/form', { replace: false });
     }}>
-      <div className="card h-100 shadow-sm p-2">
+      <div className="card h-100 shadow-sm p-2 pe-5 position-relative">
+        <BookDetailsIcon isbn={book.isbn} className="position-absolute top-right"/>
         <div className="row h-100">
-          <div className="col-3 d-flex align-items-center">
+          <div className="col-4 d-flex align-items-center">
             <img
               src={src}
               alt={`${book.title} Book Cover`}
@@ -27,7 +29,7 @@ export default function BookListItem(props: SingleBookProps) {
               onError={() => updateSrc('/images/placeholder-image.jpg')}
             />
           </div>
-          <div className="col-9 py-2">
+          <div className="col-8 py-2">
             <h6 className="two-line-truncate">{book.title}</h6>
             <p className="two-line-truncate">{book.authors.join(', ')}</p>
           </div>
