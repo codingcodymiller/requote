@@ -194,8 +194,10 @@ app.get('/api/book/:isbn', async (req, res) => {
         Authorization: process.env.ISBNDB_KEY
       }
     };
-    const response = await fetch(url, config);
+    const response = await fetch(url, config).then(res => res.json());
+    console.log('Response:', response);
     bookDetails = response.book;
+    bookDetails.description = bookDetails.synopsis;
   }
   res.status(200).json(bookDetails);
 });

@@ -10,7 +10,7 @@ export default function BackHyperlink (props: BackHyperlinkProps) {
   if (!window.history.state || window.history.state?.idx === 0) return <></>
   return (
     <a className={`text-decoration-none text-light-grey ${props.className || ""}`} href="#" onClick={() => navigate(-1)}>
-      <i className="fa-solid fa-chevron-left"></i>
+      <i className="fa-solid fa-chevron-left me-1"></i>
       Back
     </a>
   )
