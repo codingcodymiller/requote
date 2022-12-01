@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-const { determineSortOrder, determineSortType } = require('./helpers');
+const { determineSortOrder, determineSortType, getGoogleBooksIdByISBN } = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -38,11 +38,11 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookSynopsis } = req.body;
+  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "image", "synopsis", "isbn")
+        ("title", "authors", "image", "description", "isbn")
       values
         ($1, $2, $3, $4, $5)
       on conflict ("isbn")
@@ -59,10 +59,25 @@ app.post('/api/save', async (req, res) => {
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, bookSynopsis, isbn, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
+  // code below gets a better description from the Google Books API
+  // this can be done after sending a response to the client
+  const gBooksId = await getGoogleBooksIdByISBN(isbn);
+  fetch('https://www.googleapis.com/books/v1/volumes/' + gBooksId)
+    .then(res => res.json())
+    .then(res => {
+      const { description } = res.volumeInfo;
+      const updateDescription = `
+        update "books" as "b"
+           set "description" = $1
+         where "b"."isbn" = $2
+      `;
+      const params = [description, isbn];
+      db.query(updateDescription, params);
+    });
 });
 
 app.get('/api/search/:book', async (req, res) => {
@@ -74,7 +89,7 @@ app.get('/api/search/:book', async (req, res) => {
   };
   const response = await fetch(url, config);
   const bookData = await response.json();
-  bookData.books = bookData.books ? bookData.books.filter(book => book.authors && book.synopsis) : [];
+  bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
   console.log(bookData.books);
   res.status(200).json(bookData.books);
 });
@@ -93,7 +108,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
-            "b"."synopsis" as "bookSynopsis"
+            "b"."description" as "bookDescription"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1 ${specificBookCondition}
@@ -122,7 +137,7 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
-            "b"."synopsis" as "bookSynopsis"
+            "b"."description" as "bookDescription"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1 ${specificBookCondition}
@@ -139,13 +154,13 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
 
 app.get('/api/books', async (req, res) => {
   const getBooks = `
-     select "b"."title",
+     select distinct "b"."isbn",
+            "b"."title",
             "b"."image",
             "b"."bookId" as "id",
-            "b"."isbn",
-            "b"."synopsis"
-       from "quotes" as "q"
-       join "books" as "b" using ("bookId")
+            "b"."description"
+       from "books" as "b"
+       join "quotes" as "q" using ("bookId")
       where "q"."userId" = $1
    order by "b"."title" asc
   `;
@@ -163,7 +178,7 @@ app.get('/api/book/:isbn', async (req, res) => {
             "b"."bookId" as "id",
             "b"."isbn",
             "b"."authors",
-            "b"."synopsis"
+            "b"."description"
        from "books" as "b"
       where "b"."isbn" = $1
   `;

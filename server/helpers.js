@@ -20,4 +20,8 @@ function determineSortType(requestedType) {
   }
 }
 
-module.exports = { determineSortOrder, determineSortType };
+async function getGoogleBooksIdByISBN(isbn) {
+  return await fetch('https://www.googleapis.com/books/v1/volumes/?q=isbn:' + isbn).then(res => res.json()).then(res => res.items[0].id);
+}
+
+module.exports = { determineSortOrder, determineSortType, getGoogleBooksIdByISBN };
