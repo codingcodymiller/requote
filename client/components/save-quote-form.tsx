@@ -7,6 +7,9 @@ import FormControlLabel from './form-control-label';
 import { SelectedBookContext } from '../pages/save-quote';
 
 export default function SaveQuoteForm() {
+  // TODO: Make the save quote form component check if the user is logged in, and if they aren't, force them to log in.
+    // use AuthContext to determine if they are currently logged in.
+  // <a className="btn btn-primary" href="http://localhost:3000/api/login">Login</a>
   const navigate = useNavigate();
   const { isbn, title, authors, image, description } = useContext(SelectedBookContext).data;
   if (!isbn) return <Navigate to="/save-quote/book-search" />;
