@@ -9,7 +9,7 @@ export default function BookDetails(){
   const { isbn } = useParams();
   const bookDefault: BookData = {
     title: '',
-    image: '',
+    image: '/images/placeholder-image.jpg',
     authors: [''],
     isbn: '',
     description: ''
