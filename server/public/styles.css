@@ -139,6 +139,10 @@
   align-items: center;
 }
 
+.modal-container {
+  background-color: white;
+}
+
 .left {
   top: 50%;
   transform: translateY(-50%);
