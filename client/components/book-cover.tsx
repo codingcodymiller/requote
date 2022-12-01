@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
 
-
 export type BookData = {
   id: number;
   image: string;
   title: string;
+  isbn: string;
 }
 
 export default function BookCover(props: BookData){
