@@ -9,6 +9,7 @@ export type BookData = {
   authors: string[];
   image: string;
   isbn: string;
+  synopsis: string;
 }
 
 export type BookDataContextValue = {
@@ -22,7 +23,8 @@ export default function SaveQuote() {
       title: '',
       image: '',
       authors: [''],
-      isbn: ''
+      isbn: '',
+      synopsis: ''
     },
     setBookData: function (book: BookData) {
       this.data = book;
