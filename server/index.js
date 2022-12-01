@@ -38,28 +38,28 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage } = req.body;
+  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookSynopsis } = req.body;
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "image", "isbn")
+        ("title", "authors", "image", "synopsis", "isbn")
       values
-        ($1, $2, $3, $4)
+        ($1, $2, $3, $4, $5)
       on conflict ("isbn")
       do nothing
       returning "bookId"
     ),
     "existingBook" as (
       select "bookId" from "books"
-      where "isbn" = $4
+      where "isbn" = $5
     )
     insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $5, $6, to_tsvector($6), $7
+    select coalesce("existingBook"."bookId", "book"."bookId"), $6, $7, to_tsvector($7), $8
     from "book"
     full join "existingBook" on true
     returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, isbn, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, bookImage, bookSynopsis, isbn, page, quoteText, req.cookies.user_id];
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
@@ -74,7 +74,8 @@ app.get('/api/search/:book', async (req, res) => {
   };
   const response = await fetch(url, config);
   const bookData = await response.json();
-  bookData.books = bookData.books ? bookData.books.filter(book => book.authors) : [];
+  bookData.books = bookData.books ? bookData.books.filter(book => book.authors && book.synopsis) : [];
+  console.log(bookData.books);
   res.status(200).json(bookData.books);
 });
 
@@ -90,7 +91,9 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
             "q"."quoteText",
             "q"."quoteId",
             "b"."title" as "bookTitle",
-            "b"."authors" as "bookAuthors"
+            "b"."authors" as "bookAuthors",
+            "b"."isbn" as "bookISBN",
+            "b"."synopsis" as "bookSynopsis"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1 ${specificBookCondition}
@@ -117,7 +120,9 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
             "q"."quoteText",
             "q"."quoteId",
             "b"."title" as "bookTitle",
-            "b"."authors" as "bookAuthors"
+            "b"."authors" as "bookAuthors",
+            "b"."isbn" as "bookISBN",
+            "b"."synopsis" as "bookSynopsis"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1 ${specificBookCondition}
@@ -136,7 +141,9 @@ app.get('/api/books', async (req, res) => {
   const getBooks = `
      select "b"."title",
             "b"."image",
-            "b"."bookId" as "id"
+            "b"."bookId" as "id",
+            "b"."isbn",
+            "b"."synopsis"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
       where "q"."userId" = $1
@@ -146,6 +153,36 @@ app.get('/api/books', async (req, res) => {
   const result = await db.query(getBooks, params);
   const bookList = result.rows;
   res.status(200).json(bookList);
+});
+
+app.get('/api/book/:isbn', async (req, res) => {
+  const { isbn } = req.params;
+  const getBook = `
+     select "b"."title",
+            "b"."image",
+            "b"."bookId" as "id",
+            "b"."isbn",
+            "b"."authors",
+            "b"."synopsis"
+       from "books" as "b"
+      where "b"."isbn" = $1
+  `;
+  const params = [isbn];
+  const result = await db.query(getBook, params);
+  let bookDetails = null;
+  if (result.rows.length) {
+    bookDetails = result.rows[0];
+  } else {
+    const url = `https://api2.isbndb.com/book/${isbn}`;
+    const config = {
+      headers: {
+        Authorization: process.env.ISBNDB_KEY
+      }
+    };
+    const response = await fetch(url, config);
+    bookDetails = response.book;
+  }
+  res.status(200).json(bookDetails);
 });
 
 app.get('/api/login', (req, res) => {
