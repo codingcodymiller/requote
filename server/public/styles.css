@@ -30,6 +30,15 @@
   border-color: #41486b;
 }
 
+.hyperlink {
+  text-decoration: none;
+}
+
+.hyperlink:hover,
+.hyperlink:focus {
+  text-decoration: underline;
+}
+
 .section-header {
   border-bottom: 1px solid #838383;
 }

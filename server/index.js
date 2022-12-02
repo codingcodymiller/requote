@@ -77,7 +77,8 @@ app.post('/api/save', async (req, res) => {
       `;
       const params = [description, isbn];
       db.query(updateDescription, params);
-    });
+    })
+    .catch(err => console.error(err));
 });
 
 app.get('/api/search/:book', async (req, res) => {
@@ -87,11 +88,14 @@ app.get('/api/search/:book', async (req, res) => {
       Authorization: process.env.ISBNDB_KEY
     }
   };
-  const response = await fetch(url, config);
-  const bookData = await response.json();
-  bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
-  console.log(bookData.books);
-  res.status(200).json(bookData.books);
+  try {
+    const response = await fetch(url, config);
+    const bookData = await response.json();
+    bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
+    res.status(200).json(bookData.books);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
@@ -194,8 +198,7 @@ app.get('/api/book/:isbn', async (req, res) => {
         Authorization: process.env.ISBNDB_KEY
       }
     };
-    const response = await fetch(url, config).then(res => res.json());
-    console.log('Response:', response);
+    const response = await fetch(url, config).then(res => res.json()).catch(err => console.error(err));
     bookDetails = response.book;
     bookDetails.description = bookDetails.synopsis;
   }
