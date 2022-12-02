@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list'
+import NoQuotes from '../components/no-quotes';
 import SectionHeader from '../components/section-header'
+import NoResults from '../components/no-results';
 
 type QuoteSearchBody = {
   searchTerm: string;
@@ -55,6 +57,8 @@ export default function QuoteDashboard (props: Props) {
     return () => { isComponentMounted = false }
   })
 
+
+
   return (
     <>
       <SectionHeader text="Quotes" />
@@ -65,7 +69,13 @@ export default function QuoteDashboard (props: Props) {
         updateIsReversed={updateIsReversed}
         updateSearchTerm={updateSearchTerm}
       />
-      <QuoteList quotes={quoteList} />
+      {
+        quoteList.length > 0 ?
+          <QuoteList quotes={quoteList} /> :
+          searchTerm ?
+            <NoResults /> :
+            <NoQuotes />
+      }
     </>
   )
 }

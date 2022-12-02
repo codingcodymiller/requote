@@ -1,4 +1,5 @@
 import React from 'react';
+import NoQuotes from './no-quotes';
 import QuoteListItem, {QuoteData} from './quote-list-item';
 
 type QuoteListProps = {
