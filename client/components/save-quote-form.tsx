@@ -103,9 +103,9 @@ export default function SaveQuoteForm() {
         <div className="modal-container rounded shadow col-8 col-md-6 col-lg-4 p-5 text-center">
           <img className="d-block mx-auto col-8" src="/images/login.svg" alt="man opening door" />
           <h2 className="my-2">This action requires login!</h2>
-          <p>You can login with Google by clicking the button below.</p>
+          <p>You can login with your Google account by clicking the button below</p>
           <p>
-            <em>Don't worry, we'll preserve your quote for you until you return.</em>
+            <em>Don't worry, we'll preserve your quote for you until you return</em>
           </p>
           <div className="text-center">
             <a className="btn btn-navy" href="http://localhost:3000/api/login">Login with Google</a>
