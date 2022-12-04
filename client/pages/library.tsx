@@ -11,10 +11,13 @@ export default function Library() {
 
     fetch(`/api/books/`)
       .then(res => res.json())
-      .then(res => updateBookList(res));
+      .then(res => updateBookList(res))
+      .catch(err => {
+        console.error("error:", err)
+      })
 
     return () => { isComponentMounted = false }
-  })
+  }, [])
 
   return (
     <>

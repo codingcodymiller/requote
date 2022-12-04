@@ -5,7 +5,6 @@ import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';
 import FormControlLabel from './form-control-label';
 import { SelectedBookContext } from '../pages/save-quote';
-import { AuthContext } from './auth';
 
 type QuoteData = {
   page: string | null;
@@ -21,7 +20,6 @@ export default function SaveQuoteForm() {
   const navigate = useNavigate();
   const selectedBook = useContext(SelectedBookContext);
   let { isbn, title, authors, image, description } = selectedBook.data;
-  const { isAuthenticated } = useContext(AuthContext)
   let quoteData: QuoteData = {} as QuoteData;
   if(!isbn) {
     const quoteInProgress = sessionStorage.getItem("quote-to-save");
@@ -49,21 +47,28 @@ export default function SaveQuoteForm() {
       bookDescription: description,
       isbn
     };
-    if(isAuthenticated){
-      fetch('/api/save', {
-        method: 'post',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(quoteData)
+    fetch('/api/save', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(quoteData)
+    })
+      .then(res => {
+        if(res.status === 401){
+          throw new Error("Not logged in")
+        }
+        return res.json()
       })
-        .then(res => res.json())
-        .then(res => navigate('/quotes', { replace: false }));
-    } else {
-      sessionStorage.setItem("quote-to-save", JSON.stringify(quoteData));
-      toggleModal(!modalVisible)
-    }
+      .then(() => {
+          navigate('/quotes', { replace: false })
+      })
+      .catch(err => {
+        console.error(err)
+        sessionStorage.setItem("quote-to-save", JSON.stringify(quoteData));
+        toggleModal(!modalVisible)
+      })
   };
   return (
     <>
