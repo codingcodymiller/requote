@@ -52,10 +52,13 @@ export default function QuoteDashboard (props: Props) {
     .then(res => {
       if (!isComponentMounted) return;
       updateQuoteList(res)
+    })
+    .catch(err => {
+      console.error("error:", err)
     });
 
     return () => { isComponentMounted = false }
-  })
+  }, [searchTerm, sortType, isReversed])
 
 
 

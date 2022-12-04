@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-const { determineSortOrder, determineSortType, getGoogleBooksIdByISBN } = require('./helpers');
+const { determineSortOrder, determineSortType, verifyJWT, getGoogleBooksIdByISBN } = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -38,6 +38,14 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(401).json({ error: 'User token not valid' });
+  }
+
   const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription } = req.body;
   const selectOrInsertBook = `
     with "book" as (
@@ -52,14 +60,20 @@ app.post('/api/save', async (req, res) => {
     "existingBook" as (
       select "bookId" from "books"
       where "isbn" = $5
+    ),
+    "user" as (
+      select "userId" from "users"
+      where "token" = $8
     )
     insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $6, $7, to_tsvector($7), $8
+    select coalesce("existingBook"."bookId", "book"."bookId"), $6, $7, to_tsvector($7), "userId"
     from "book"
     full join "existingBook" on true
+    join "user" on true
     returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, req.cookies.user_id];
+  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, userTokenDecoded.sub];
+  console.log('params:', params);
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
@@ -99,6 +113,14 @@ app.get('/api/search/:book', async (req, res) => {
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(200).json([]);
+  }
+  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(200).json([]);
+  }
+
   const { sort, order } = req.query;
   const { bookId } = req.params;
   const sortOrder = determineSortOrder(order);
@@ -106,6 +128,10 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   const specificBookCondition = bookId ? 'and "b"."bookId" = $2' : '';
 
   const getQuotes = `
+     with "user" as (
+      select "userId" from "users"
+      where "token" = $1
+     )
      select "q"."page",
             "q"."quoteText",
             "q"."quoteId",
@@ -115,10 +141,11 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
             "b"."description" as "bookDescription"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
-      where "q"."userId" = $1 ${specificBookCondition}
+       join "user" on true
+      where "q"."userId" = "user"."userId" ${specificBookCondition}
    order by ${sortType} ${sortOrder}
   `;
-  const params = [req.cookies.user_id];
+  const params = [userTokenDecoded.sub];
   if (bookId) params.push(bookId);
 
   const result = await db.query(getQuotes, params);
@@ -127,6 +154,14 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
 });
 
 app.post('/api/quotes/:bookId?', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(200).json([]);
+  }
+  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(200).json([]);
+  }
+
   const { searchTerm } = req.body;
   const { sort, order } = req.query;
   const { bookId } = req.params;
@@ -135,6 +170,10 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
   const specificBookCondition = bookId ? 'and "b"."bookId" = $3' : '';
 
   const getQuotes = `
+     with "user" as (
+      select "userId" from "users"
+      where "token" = $1
+     )
      select "q"."page",
             "q"."quoteText",
             "q"."quoteId",
@@ -144,11 +183,12 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
             "b"."description" as "bookDescription"
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
-      where "q"."userId" = $1 ${specificBookCondition}
+       join "user" on true
+      where "q"."userId" = "user"."userId" ${specificBookCondition}
         and "q"."quoteVector" @@ to_tsquery($2)
    order by ${sortType} ${sortOrder}
   `;
-  const params = [req.cookies.user_id, searchTerm];
+  const params = [userTokenDecoded.sub, searchTerm];
   if (bookId) params.push(bookId);
 
   const result = await db.query(getQuotes, params);
@@ -157,7 +197,19 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
 });
 
 app.get('/api/books', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(200).json([]);
+  }
+  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(200).json([]);
+  }
+
   const getBooks = `
+     with "user" as (
+      select "userId" from "users"
+      where "token" = $1
+     )
      select distinct "b"."isbn",
             "b"."title",
             "b"."image",
@@ -165,10 +217,11 @@ app.get('/api/books', async (req, res) => {
             "b"."description"
        from "books" as "b"
        join "quotes" as "q" using ("bookId")
-      where "q"."userId" = $1
+       join "user" on true
+      where "q"."userId" = "user"."userId"
    order by "b"."title" asc
   `;
-  const params = [req.cookies.user_id];
+  const params = [userTokenDecoded.sub];
   const result = await db.query(getBooks, params);
   const bookList = result.rows;
   res.status(200).json(bookList);
@@ -229,12 +282,13 @@ app.get('/api/auth', async (req, res) => {
   const response = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
   const tokens = await response.json();
 
-  const { access_token: token, refresh_token: refreshToken, id_token: idTokenRaw } = tokens;
-  const decodedId = jwt.decode(idTokenRaw);
+  // eslint-disable-next-line camelcase
+  const { access_token, id_token } = tokens;
+  const decodedId = jwt.decode(id_token);
 
   const findExistingUser = `
-      select * from "users"
-      where "token" = $1
+    select * from "users"
+    where "token" = $1
   `;
   const params = [decodedId.sub];
   const result = await db.query(findExistingUser, params);
@@ -242,16 +296,18 @@ app.get('/api/auth', async (req, res) => {
 
   if (!user) {
     const createNewUser = `
-    insert into "users" ("token")
-    values ($1)
-    returning *
+      insert into "users" ("token")
+      values ($1)
+      returning *
     `;
     const result = await db.query(createNewUser, params);
     user = result.rows[0];
   }
-  res.cookie('access_token', token)
-    .cookie('refresh_token', refreshToken)
-    .cookie('user_id', user.userId)
+  res.cookie('access_token', access_token)
+    .cookie('user_token', id_token, {
+      httpOnly: true,
+      sameSite: 'lax'
+    })
     .status(201)
     .redirect('/save-quote/form');
 });
