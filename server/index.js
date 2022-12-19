@@ -73,7 +73,6 @@ app.post('/api/save', async (req, res) => {
     returning *
   `;
   const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, userTokenDecoded.sub];
-  console.log('params:', params);
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
