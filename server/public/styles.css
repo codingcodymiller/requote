@@ -148,14 +148,14 @@
   align-items: center;
 }
 
-.modal-container {
-  background-color: white;
-}
-
 .left {
   top: 50%;
   transform: translateY(-50%);
   left: 1rem;
+}
+
+.disabled {
+  opacity: 0.4;
 }
 
 .header-size {
