@@ -4,6 +4,7 @@ import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';
 import FormControlLabel from './form-control-label';
+import Modal from './modal';
 import { SelectedBookContext } from '../pages/save-quote';
 
 type QuoteData = {
@@ -104,19 +105,15 @@ export default function SaveQuoteForm() {
           <button className="btn btn-lg btn-navy my-2">Submit</button>
         </div>
       </form>
-      <div className={`position-fixed fill-area bg-shadow d-flex justify-content-center align-items-center ${modalVisible ? '' : 'd-none'}`}>
-        <div className="modal-container rounded shadow col-8 col-md-6 col-lg-4 p-5 text-center">
-          <img className="d-block mx-auto col-8" src="/images/login.svg" alt="man opening door" />
-          <h2 className="my-2">This action requires login!</h2>
-          <p>You can login with your Google account by clicking the button below</p>
-          <p>
-            <em>Don't worry, we'll preserve your quote for you until you return</em>
-          </p>
-          <div className="text-center">
-            <a className="btn btn-navy" href="http://localhost:3000/api/login">Login with Google</a>
-          </div>
-        </div>
-      </div>
+      <Modal isOpen={modalVisible} handleClose={() => toggleModal(!modalVisible)} className="text-center">
+        <img className="d-block mx-auto col-8" src="/images/login.svg" alt="man opening door" />
+        <h2 className="my-2">This action requires login!</h2>
+        <p>You can login with your Google account by clicking the button below</p>
+        <p>
+          <em>Don't worry, we'll preserve your quote for you until you return</em>
+        </p>
+        <a className="btn btn-navy" href="http://localhost:3000/api/login">Login with Google</a>
+      </Modal>
     </>
   );
 }

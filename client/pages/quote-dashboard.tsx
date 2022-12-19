@@ -20,9 +20,7 @@ type RequestConfig = {
   body?: string;
 }
 
-interface Props { match?: { params: { bookId: string; }; }; }
-
-export default function QuoteDashboard (props: Props) {
+export default function QuoteDashboard () {
   const [searchTerm, updateSearchTerm] = useState('');
   const [sortType, updateSortType] = useState('date');
   const [isReversed, updateIsReversed] = useState(false);
@@ -71,6 +69,7 @@ export default function QuoteDashboard (props: Props) {
         updateSortType={updateSortType}
         updateIsReversed={updateIsReversed}
         updateSearchTerm={updateSearchTerm}
+        disabled={!quoteList.length}
       />
       {
         quoteList.length > 0 ?
