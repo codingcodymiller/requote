@@ -285,23 +285,15 @@ app.get('/api/auth', async (req, res) => {
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
 
-  const findExistingUser = `
-    select * from "users"
-    where "token" = $1
+  const createNewUser = `
+    insert into "users" ("token", "username")
+    values ($1, $2)
+    on conflict ("token")
+    do nothing
   `;
-  const params = [decodedId.sub];
-  const result = await db.query(findExistingUser, params);
-  let [user] = result.rows;
+  const params = [decodedId.sub, decodedId.email.split('@')[0]];
+  db.query(createNewUser, params);
 
-  if (!user) {
-    const createNewUser = `
-      insert into "users" ("token")
-      values ($1)
-      returning *
-    `;
-    const result = await db.query(createNewUser, params);
-    user = result.rows[0];
-  }
   res.cookie('access_token', access_token)
     .cookie('user_token', id_token, {
       httpOnly: true,
