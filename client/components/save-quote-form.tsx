@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.bubble.css';
+import 'react-quill/dist/quill.snow.css';
 
 import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
@@ -96,9 +96,10 @@ export default function SaveQuoteForm() {
           id="quote"
         />
         <ReactQuill
-          theme="bubble"
+          theme="snow"
           id="quote"
-          className="text-editor col-12 h-100 p-2 border-1 border-light rounded shadow-sm bg-white mb-3"
+          placeholder="Once upon a midnight dreary..."
+          className="text-editor col-12 h-100 p-3 border-1 border-light rounded shadow-sm bg-white mb-3"
           value={quote}
           onChange={updateQuote}
         />
