@@ -1,8 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
-import FormControlTextArea from './form-control-textarea';
 import FormControlLabel from './form-control-label';
 import Modal from './modal';
 import { SelectedBookContext } from '../pages/save-quote';
@@ -63,7 +65,8 @@ export default function SaveQuoteForm() {
         return res.json()
       })
       .then(() => {
-          navigate('/quotes', { replace: false })
+        sessionStorage.removeItem("quote-to-save")
+        navigate('/quotes', { replace: false })
       })
       .catch(err => {
         console.error(err)
@@ -87,19 +90,18 @@ export default function SaveQuoteForm() {
           value={page}
           updateValue={updatePage}
         />
-        <DropZone updateQuote={updateQuote} />
+        <DropZone updateQuote={updateQuote} quote={quote} />
         <FormControlLabel
           label="Quote"
           id="quote"
         />
-        <FormControlTextArea
-          name="quote"
+        <ReactQuill
+          theme="snow"
           id="quote"
-          value={quote}
-          updateValue={updateQuote}
-          rows={6}
           placeholder="Once upon a midnight dreary..."
-          required
+          className="text-editor col-12 h-100 p-3 border-1 border-light rounded shadow-sm bg-white mb-3"
+          value={quote}
+          onChange={updateQuote}
         />
         <div className="text-end">
           <button className="btn btn-lg btn-navy my-2">Submit</button>
