@@ -28,12 +28,16 @@ export default function DropZone({ updateQuote}: DropZoneProps) {
   }, [])
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
   return (
-    imagePath
-      ? <img className="rounded w-100 bg-shadow mt-4 mb-2" src={imagePath} alt="Image Preview" />
-    : <div {...getRootProps({ className: "dropzone bg-shadow mt-4 mb-2 p-3" })}>
-        <input className="input-zone" {...getInputProps()} />
-        <div className="dropzone-body text-center h-100 w-100">
-          <div>
+    <div {...getRootProps({ className: "dropzone bg-shadow mt-4 mb-2 p-3 cursor-pointer" })}>
+      <input className="input-zone" {...getInputProps()} />
+      <div className="dropzone-body text-center h-100 w-100">
+        {
+          imagePath ?
+            <div className="row justify-content-center image-upload-preview">
+              <img src={imagePath} alt="Uploaded image" className="d-block h-100" />
+            </div>
+          :
+          <>
             <p className="m-1 text-aqua-blue">
               <i className="fa-solid fa-image fa-2xl"></i>
             </p>
@@ -41,10 +45,11 @@ export default function DropZone({ updateQuote}: DropZoneProps) {
               Drag and drop an image containing text here
             </p>
             <p className="m-1 text-light-grey">
-              or click to select files
+              or click here to select a file to upload
             </p>
-          </div>
-        </div>
+          </>
+        }
       </div>
+    </div>
   );
 }

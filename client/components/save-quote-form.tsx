@@ -1,5 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
 import FormControlTextArea from './form-control-textarea';

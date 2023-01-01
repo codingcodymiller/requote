@@ -18,6 +18,16 @@
   color: #45b2d5;
 }
 
+.image-upload-preview {
+  height: 300px;
+}
+
+.image-upload-preview > img {
+  opacity: 0.5;
+  padding: 10px;
+  border: 1px solid lightgrey;
+}
+
 .btn-navy {
   color: #fff;
   background-color: #3a405a;
@@ -135,7 +145,7 @@
 }
 
 .dropzone {
-  height: 200px;
+  min-height: 200px;
   border-radius: 5px;
   background-color: white;
 }
@@ -143,6 +153,7 @@
 .dropzone-body {
   border: 2px dashed #45b2d5;
   border-radius: 3px;
+  padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
