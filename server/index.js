@@ -120,11 +120,19 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
     return res.status(200).json([]);
   }
 
-  const { sort, order } = req.query;
+  const { sort, order, searchTerm } = req.query;
   const { bookId } = req.params;
+
   const sortOrder = determineSortOrder(order);
   const sortType = determineSortType(sort);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $2' : '';
+
+  const params = [userTokenDecoded.sub];
+
+  if (bookId) params.push(bookId);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+
+  if (searchTerm) params.push(searchTerm);
+  const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
 
   const getQuotes = `
      with "user" as (
@@ -141,37 +149,38 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
        join "user" on true
-      where "q"."userId" = "user"."userId" ${specificBookCondition}
+      where "q"."userId" = "user"."userId"
+      ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
-  const params = [userTokenDecoded.sub];
-  if (bookId) params.push(bookId);
 
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
+
   res.status(200).json(quoteList);
 });
 
-app.post('/api/quotes/:bookId?', async (req, res) => {
-  if (!req.cookies.user_token) {
-    return res.status(200).json([]);
-  }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
-    return res.status(200).json([]);
-  }
+app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
 
-  const { searchTerm } = req.body;
-  const { sort, order } = req.query;
-  const { bookId } = req.params;
+  const { sort, order, searchTerm } = req.query;
+  const { username, bookId } = req.params;
+
   const sortOrder = determineSortOrder(order);
   const sortType = determineSortType(sort);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $3' : '';
+
+  const params = [username];
+
+  if (bookId) params.push(bookId);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+
+  if (searchTerm) params.push(searchTerm);
+  const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
 
   const getQuotes = `
      with "user" as (
-      select "userId" from "users"
-      where "token" = $1
+      select "u"."userId"
+      from "users" as "u"
+      where "username" = $1
      )
      select "q"."page",
             "q"."quoteText",
@@ -183,15 +192,14 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
        join "user" on true
-      where "q"."userId" = "user"."userId" ${specificBookCondition}
-        and "q"."quoteVector" @@ to_tsquery($2)
+      where "q"."userId" = "user"."userId"
+      ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
-  const params = [userTokenDecoded.sub, searchTerm];
-  if (bookId) params.push(bookId);
 
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
+
   res.status(200).json(quoteList);
 });
 
@@ -284,6 +292,7 @@ app.get('/api/auth', async (req, res) => {
   // eslint-disable-next-line camelcase
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
+  const username = decodedId.email.split('@')[0];
 
   const createNewUser = `
     insert into "users" ("token", "username")
@@ -291,10 +300,11 @@ app.get('/api/auth', async (req, res) => {
     on conflict ("token")
     do nothing
   `;
-  const params = [decodedId.sub, decodedId.email.split('@')[0]];
+  const params = [decodedId.sub, username];
   db.query(createNewUser, params);
 
   res.cookie('access_token', access_token)
+    .cookie('username', username)
     .cookie('user_token', id_token, {
       httpOnly: true,
       sameSite: 'lax'

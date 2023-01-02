@@ -134,6 +134,10 @@
   align-items: center;
 }
 
+.ql-container.ql-snow {
+  border: none;
+}
+
 .disabled {
   opacity: 0.4;
 }

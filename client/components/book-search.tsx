@@ -11,7 +11,7 @@ export default function BookSearch() {
   }
   return (
     <>
-      <SearchBar label="Book Title" placeholder="Ex: The Hobbit" handleSearchSubmit={searchBooks} />
+      <SearchBar label="Book Title" className="col-12" placeholder="Ex: The Hobbit" handleSearchSubmit={searchBooks} />
       <ResultList results={results} />
     </>
   );
