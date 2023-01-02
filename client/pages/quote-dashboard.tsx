@@ -6,20 +6,6 @@ import NoQuotes from '../components/no-quotes';
 import SectionHeader from '../components/section-header'
 import NoResults from '../components/no-results';
 
-type QuoteSearchBody = {
-  searchTerm: string;
-}
-
-type RequestHeaders = {
-  "Content-Type": string;
-}
-
-type RequestConfig = {
-  method: string;
-  headers?: RequestHeaders,
-  body?: string;
-}
-
 export default function QuoteDashboard () {
   const [searchTerm, updateSearchTerm] = useState('');
   const [sortType, updateSortType] = useState('date');
@@ -30,22 +16,9 @@ export default function QuoteDashboard () {
   useEffect(() => {
     let isComponentMounted = true;
 
-    let config: RequestConfig = {
-      method: "get"
-    }
-    if (searchTerm) {
-      const reqBody: QuoteSearchBody = { searchTerm };
-      config = {
-        method: "post",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(reqBody)
-      }
-    }
     const order = isReversed ? "ascending" : "descending";
 
-    fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}`, config)
+    fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`)
     .then(res => res.json())
     .then(res => {
       if (!isComponentMounted) return;
@@ -56,7 +29,7 @@ export default function QuoteDashboard () {
     });
 
     return () => { isComponentMounted = false }
-  }, [searchTerm, sortType, isReversed])
+  }, [searchTerm, sortType, isReversed, bookId])
 
 
 
@@ -69,7 +42,7 @@ export default function QuoteDashboard () {
         updateSortType={updateSortType}
         updateIsReversed={updateIsReversed}
         updateSearchTerm={updateSearchTerm}
-        disabled={!quoteList.length}
+        disabled={!quoteList.length && !searchTerm}
       />
       {
         quoteList.length > 0 ?

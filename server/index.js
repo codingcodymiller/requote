@@ -120,53 +120,19 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
     return res.status(200).json([]);
   }
 
-  const { sort, order } = req.query;
+  const { sort, order, searchTerm } = req.query;
   const { bookId } = req.params;
+
   const sortOrder = determineSortOrder(order);
   const sortType = determineSortType(sort);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $2' : '';
 
-  const getQuotes = `
-     with "user" as (
-      select "userId" from "users"
-      where "token" = $1
-     )
-     select "q"."page",
-            "q"."quoteText",
-            "q"."quoteId",
-            "b"."title" as "bookTitle",
-            "b"."authors" as "bookAuthors",
-            "b"."isbn" as "bookISBN",
-            "b"."description" as "bookDescription"
-       from "quotes" as "q"
-       join "books" as "b" using ("bookId")
-       join "user" on true
-      where "q"."userId" = "user"."userId" ${specificBookCondition}
-   order by ${sortType} ${sortOrder}
-  `;
   const params = [userTokenDecoded.sub];
+
   if (bookId) params.push(bookId);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
 
-  const result = await db.query(getQuotes, params);
-  const quoteList = result.rows;
-  res.status(200).json(quoteList);
-});
-
-app.post('/api/quotes/:bookId?', async (req, res) => {
-  if (!req.cookies.user_token) {
-    return res.status(200).json([]);
-  }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
-    return res.status(200).json([]);
-  }
-
-  const { searchTerm } = req.body;
-  const { sort, order } = req.query;
-  const { bookId } = req.params;
-  const sortOrder = determineSortOrder(order);
-  const sortType = determineSortType(sort);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $3' : '';
+  if (searchTerm) params.push(searchTerm);
+  const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
 
   const getQuotes = `
      with "user" as (
@@ -183,15 +149,14 @@ app.post('/api/quotes/:bookId?', async (req, res) => {
        from "quotes" as "q"
        join "books" as "b" using ("bookId")
        join "user" on true
-      where "q"."userId" = "user"."userId" ${specificBookCondition}
-        and "q"."quoteVector" @@ to_tsquery($2)
+      where "q"."userId" = "user"."userId"
+      ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
-  const params = [userTokenDecoded.sub, searchTerm];
-  if (bookId) params.push(bookId);
 
   const result = await db.query(getQuotes, params);
   const quoteList = result.rows;
+
   res.status(200).json(quoteList);
 });
 
