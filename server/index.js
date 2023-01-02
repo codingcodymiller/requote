@@ -292,6 +292,7 @@ app.get('/api/auth', async (req, res) => {
   // eslint-disable-next-line camelcase
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
+  const username = decodedId.email.split('@')[0];
 
   const createNewUser = `
     insert into "users" ("token", "username")
@@ -299,10 +300,11 @@ app.get('/api/auth', async (req, res) => {
     on conflict ("token")
     do nothing
   `;
-  const params = [decodedId.sub, decodedId.email.split('@')[0]];
+  const params = [decodedId.sub, username];
   db.query(createNewUser, params);
 
   res.cookie('access_token', access_token)
+    .cookie('username', username)
     .cookie('user_token', id_token, {
       httpOnly: true,
       sameSite: 'lax'
