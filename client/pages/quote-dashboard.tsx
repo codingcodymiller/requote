@@ -11,14 +11,21 @@ export default function QuoteDashboard () {
   const [sortType, updateSortType] = useState('date');
   const [isReversed, updateIsReversed] = useState(false);
   const [quoteList, updateQuoteList] = useState([]);
-  const { bookId } = useParams();
+  const { bookId, username } = useParams();
 
   useEffect(() => {
     let isComponentMounted = true;
 
     const order = isReversed ? "ascending" : "descending";
 
-    fetch(`/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`)
+    let url = null;
+    if(username){
+      url = `/api/${username}/shared-quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`
+    } else {
+      url = `/api/quotes${bookId ? `/${bookId}` : ''}?sort=${sortType}&order=${order}${searchTerm ? `&searchTerm=${searchTerm}` : ''}`;
+    }
+
+    fetch(url)
     .then(res => res.json())
     .then(res => {
       if (!isComponentMounted) return;
@@ -29,7 +36,7 @@ export default function QuoteDashboard () {
     });
 
     return () => { isComponentMounted = false }
-  }, [searchTerm, sortType, isReversed, bookId])
+  }, [searchTerm, sortType, isReversed, bookId, username])
 
 
 
