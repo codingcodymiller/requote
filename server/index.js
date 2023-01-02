@@ -160,6 +160,49 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   res.status(200).json(quoteList);
 });
 
+app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
+
+  const { sort, order, searchTerm } = req.query;
+  const { username, bookId } = req.params;
+
+  const sortOrder = determineSortOrder(order);
+  const sortType = determineSortType(sort);
+
+  const params = [username];
+
+  if (bookId) params.push(bookId);
+  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+
+  if (searchTerm) params.push(searchTerm);
+  const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
+
+  const getQuotes = `
+     with "user" as (
+      select "u"."userId"
+      from "users" as "u"
+      where "username" = $1
+     )
+     select "q"."page",
+            "q"."quoteText",
+            "q"."quoteId",
+            "b"."title" as "bookTitle",
+            "b"."authors" as "bookAuthors",
+            "b"."isbn" as "bookISBN",
+            "b"."description" as "bookDescription"
+       from "quotes" as "q"
+       join "books" as "b" using ("bookId")
+       join "user" on true
+      where "q"."userId" = "user"."userId"
+      ${specificBookCondition} ${searchTermCondition}
+   order by ${sortType} ${sortOrder}
+  `;
+
+  const result = await db.query(getQuotes, params);
+  const quoteList = result.rows;
+
+  res.status(200).json(quoteList);
+});
+
 app.get('/api/books', async (req, res) => {
   if (!req.cookies.user_token) {
     return res.status(200).json([]);
