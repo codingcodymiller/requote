@@ -1,11 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './app';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!) //exclamation mark tells typescript there is no possibility of the return being null
+
+root.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>,
-  document.querySelector('#root')
+  </BrowserRouter>
 );

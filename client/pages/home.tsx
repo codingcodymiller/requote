@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <div className="position-fixed landing-container bg-aqua-blue">
       <CSSTransition nodeRef={logoRef} in={inProp} timeout={500} classNames="landing-logo">
-        <img ref={logoRef} className="position-absolute landing-logo" src="/logo.svg" alt="ReQuote logo" />
+        <img ref={logoRef} className="position-absolute landing-logo" src="/images/logo.svg" alt="ReQuote logo" />
       </CSSTransition>
       <CSSTransition nodeRef={floorRef} in={inProp} timeout={2700} classNames="landing-floor" onEntered={handleTransitionEnd}>
         <div ref={floorRef} className="position-absolute bg-lavender-grey rounded-border-top landing-floor text-center p-5">
