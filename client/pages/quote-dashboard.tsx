@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import SectionHeader from '../components/section-header';
+import BookCarousel from '../components/book-carousel';
 import QuoteSearch from '../components/quote-search';
-import QuoteList from '../components/quote-list'
+import QuoteList from '../components/quote-list';
 import NoQuotes from '../components/no-quotes';
-import SectionHeader from '../components/section-header'
 import NoResults from '../components/no-results';
 
 export default function QuoteDashboard () {
@@ -43,6 +44,7 @@ export default function QuoteDashboard () {
   return (
     <>
       <SectionHeader text="Quotes" />
+      <BookCarousel />
       <QuoteSearch
         sortType={sortType}
         isReversed={isReversed}
