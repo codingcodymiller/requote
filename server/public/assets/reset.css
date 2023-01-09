@@ -15,3 +15,7 @@ blockquote {
   margin-left: 1.5rem rem;
   padding-left: 1rem;
 }
+
+.glider-slide {
+  min-width: unset !important; /* react-glider slides have a forced minimum width, for some reason */
+}
