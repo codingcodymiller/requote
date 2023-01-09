@@ -20,8 +20,16 @@
   color: #45b2d5;
 }
 
+.hover-aqua-blue:hover {
+  color: #45b2d5;
+}
+
 .rounded-border-top {
   border-radius: 20px 20px 0 0;
+}
+
+.br-10 {
+  border-radius: 10px;
 }
 
 .two-line-truncate {
@@ -177,7 +185,6 @@
   aspect-ratio: 1/1.5;
   object-fit: cover;
   object-position: top;
-  border-radius: 0.5rem;
 }
 
 .landing-container {

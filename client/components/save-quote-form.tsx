@@ -94,7 +94,7 @@ export default function SaveQuoteForm() {
           label="Quote"
           id="quote"
         />
-        <div className="text-editor col-12 p-3 border-1 border-light rounded shadow-sm bg-white mb-3">
+        <div className="col-12 br-10 shadow-sm mb-3">
           <RichTextEditor
             id="quote"
             placeholder="Once upon a midnight dreary..."
