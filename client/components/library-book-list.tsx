@@ -10,7 +10,7 @@ export default function LibraryBookList(props: LibraryListProps) {
   if (!props.results.length) return <NoBooks />;
 
   const results = props.results
-    .map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} />);
+    .map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} className="col-6 col-sm-3 my-2" details rounded />);
 
   return (
     <div className="row">
