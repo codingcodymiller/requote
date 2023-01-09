@@ -7,7 +7,7 @@ export default function AppHeader() {
       <div className="row justify-content-between">
         <div className="col-5 col-sm-4 col-md-3 col-lg-2">
           <Link to="/">
-            <img className="logo" src="/logo.svg" alt="ReQuote logo" />
+            <img className="logo" src="/images/logo.svg" alt="ReQuote logo" />
           </Link>
         </div>
         <nav className="col-6 justify-content-end align-items-center d-none d-md-flex desktop-nav pe-4">

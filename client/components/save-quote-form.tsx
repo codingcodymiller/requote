@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
+import RichTextEditor from './rich-text-editor';
 import DropZone from './dropzone'
 import FormControlInput from './form-control-input';
 import FormControlLabel from './form-control-label';
@@ -95,14 +94,14 @@ export default function SaveQuoteForm() {
           label="Quote"
           id="quote"
         />
-        <ReactQuill
-          theme="snow"
-          id="quote"
-          placeholder="Once upon a midnight dreary..."
-          className="text-editor col-12 h-100 p-3 border-1 border-light rounded shadow-sm bg-white mb-3"
-          value={quote}
-          onChange={updateQuote}
-        />
+        <div className="text-editor col-12 p-3 border-1 border-light rounded shadow-sm bg-white mb-3">
+          <RichTextEditor
+            id="quote"
+            placeholder="Once upon a midnight dreary..."
+            value={quote}
+            onChange={updateQuote}
+          />
+        </div>
         <div className="text-end">
           <button className="btn btn-lg btn-navy my-2">Submit</button>
         </div>
