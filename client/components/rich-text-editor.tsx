@@ -17,10 +17,11 @@ export default function RichTextEditor({ id, placeholder, value, onChange }: Ric
         placeholder,
         height: 500,
         menubar: false,
+        statusbar: false,
         plugins: [
           'advlist', 'anchor', 'autolink', 'charmap',
           'code', 'help', 'link', 'lists',
-          'searchreplace', 'visualblocks', 'wordcount'
+          'searchreplace', 'visualblocks',
         ],
         toolbar: 'h1 h2 | ' +
           'bold italic strikethrough underline | alignleft aligncenter | ' +
