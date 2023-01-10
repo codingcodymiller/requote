@@ -10,7 +10,7 @@ type SortProps = {
   updateIsReversed: (isReversed: boolean) => void;
 }
 
-export default function QuoteSort (props: SortProps){
+export default function QuoteControls (props: SortProps){
   const { sortType, isReversed, updateSortType, updateIsReversed } = props;
   let location = useLocation();
   const regex: RegExp = /\/.*\/quotes/g;
@@ -36,16 +36,16 @@ export default function QuoteSort (props: SortProps){
   return (
     <>
       <button aria-label="Filter Quotes" data-balloon-pos="up" className="btn btn-link text-dark px-1 mx-2">
-        <i className="fa-solid fa-xl fa-filter" onClick={() => toggleModal(!modalVisible)}></i>
+        <i className="fa-light fa-xl fa-filter-list" onClick={() => toggleModal(!modalVisible)}></i>
       </button>
       <button aria-label="Reverse Quote Order" data-balloon-pos="up" className="btn btn-link text-dark px-1 mx-2">
-        <i className={`fa-solid fa-xl fa-arrow-${isReversed ? "up" : "down"}`} onClick={reverseList}></i>
+        <i className={`fa-light fa-xl fa-arrow-${isReversed ? "up" : "down"}`} onClick={reverseList}></i>
       </button>
       {
         viewingSharedQuotes || !username
           ? <></> :
           <button aria-label={shareLabel} data-balloon-pos="up" className="btn btn-link text-dark px-1 mx-2" onMouseOut={resetLinkToolTip}>
-            <i className="fa-solid fa-xl fa-share-nodes" onClick={handleCopyLink}></i>
+            <i className="fa-light fa-xl fa-share-nodes" onClick={handleCopyLink}></i>
           </button>
       }
       <Modal isOpen={modalVisible} handleClose={() => toggleModal(!modalVisible)}>
