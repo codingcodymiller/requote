@@ -4,7 +4,9 @@ import ResultList from './result-list';
 
 export default function BookSearch() {
   const [results, updateResults] = useState([]);
+  const [searchTerm, updateSearchTerm] = useState('')
   const searchBooks = (searchTerm: string) => {
+    updateSearchTerm(searchTerm)
     fetch(`/api/search/${encodeURIComponent(`"${searchTerm}"`)}`)
       .then(res => res.json())
       .then(res => updateResults(res));
@@ -12,7 +14,7 @@ export default function BookSearch() {
   return (
     <>
       <SearchBar label="Book Title" className="col-12" placeholder="Ex: The Hobbit" handleSearchSubmit={searchBooks} />
-      <ResultList results={results} />
+      <ResultList results={results} searchTerm={searchTerm} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import SearchBar from './search-bar';
-import QuoteSort from './quote-sort'
+import QuoteControls from './quote-controls'
 
 type QuoteSearchProps = {
   sortType: string;
@@ -16,7 +16,7 @@ export default function QuoteSearch (props: QuoteSearchProps) {
   return (
     <div className={`d-flex flex-nowrap justify-content-evenly align-items-center ${ disabled ? 'pe-none disabled' : '' }`}>
       <SearchBar className="flex-grow-1" handleSearchSubmit={updateSearchTerm} placeholder="Search..." />
-      <QuoteSort
+      <QuoteControls
         sortType={sortType}
         isReversed={isReversed}
         updateSortType={updateSortType}
