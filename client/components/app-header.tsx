@@ -27,15 +27,15 @@ export default function AppHeader() {
         <nav className="col-12 d-flex justify-content-evenly align-items-center d-md-none mobile-nav">
           <Link to="/save-quote/book-search" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-light fa-pen-clip fa-xl"></i>
-            <span className="text-small">Save Quote</span>
+            <span className="tiny-text">Save Quote</span>
           </Link>
           <Link to="/library" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-light fa-books fa-xl"></i>
-            <span className="text-small">Library</span>
+            <span className="tiny-text">Library</span>
           </Link>
           <Link to="/quotes" className="text-center text-dark-navy text-decoration-none">
             <i className="d-block m-3 fa-light fa-book-bookmark fa-xl"></i>
-            <span className="text-small">Quotes</span>
+            <span className="tiny-text">Quotes</span>
           </Link>
         </nav>
       </div>

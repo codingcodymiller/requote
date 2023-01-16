@@ -1,3 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Battambang:wght@300&display=swap');
+
+$font-family-base: "Zilla Slab";
+$headings-font-family: Battambang, serif;
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+.quote h1,
+.quote h2,
+.quote h3 {
+  font-family: $font-family-base;
+}
 /* UTILITY CLASSES */
 
 .bg-aqua-blue {
@@ -140,10 +153,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.ql-container.ql-snow {
-  border: none;
 }
 
 .disabled {
