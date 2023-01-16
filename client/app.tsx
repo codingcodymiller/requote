@@ -11,6 +11,7 @@ import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
 import QuoteDashboard from './pages/quote-dashboard'
 import BookDetails from './pages/book-details';
+import './styles/styles.scss'
 
 export default function App() {
   return (

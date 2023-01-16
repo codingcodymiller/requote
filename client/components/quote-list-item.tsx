@@ -15,7 +15,7 @@ type SingleQuoteProps = {
 export default function QuoteListItem(props: SingleQuoteProps){
   const {quote} = props;
   return (
-    <div className="col-12 my-2">
+    <div className="col-12 my-2 quote">
       <div className="card h-100 shadow-sm p-3 position-relative">
         <div className="row h-100">
           <div className="col-12">
