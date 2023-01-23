@@ -11,7 +11,7 @@ type RichTextEditorProps = {
 export default function RichTextEditor({ id, placeholder, value, onChange }: RichTextEditorProps) {
   return (
     <Editor
-      apiKey='se3vqbded007gnz1j8m352wjdeyfscapoye2p195nmstwvb1'
+      apiKey={process.env.TINYMCE_KEY}
       id={id}
       init={{
         placeholder,
