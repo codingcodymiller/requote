@@ -17,8 +17,8 @@ const serverPublicPath = path.join(__dirname, 'server', 'public');
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const PATHS = {
-  css: path.join(serverPublicPath, 'assets'),
-  sass: path.join(clientPath, 'styles')
+  public: path.join(serverPublicPath, 'assets'),
+  client: clientPath
 };
 
 module.exports = {
@@ -70,17 +70,7 @@ module.exports = {
   devtool: isDevelopment ? 'cheap-module-source-map' : 'source-map',
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
-    splitChunks: {
-      cacheGroups: {
-        styles: {
-          name: 'styles',
-          type: 'css/mini-extract',
-          chunks: 'all',
-          enforce: true
-        }
-      }
-    }
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -124,9 +114,10 @@ module.exports = {
       chunkFilename: isDevelopment ? '[id].css' : '[id].[contenthash].css'
     }),
     new PurgeCSSPlugin({
+      safelist: [/^glider-/],
       paths: glob.sync([
-        `${PATHS.css}/**/*`,
-        `${PATHS.sass}/**/*`
+        `${PATHS.client}/**/*`,
+        `${PATHS.public}/**/*`
       ], { nodir: true })
     }),
     new CompressionPlugin({
