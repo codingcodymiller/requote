@@ -68,17 +68,7 @@ module.exports = {
   devtool: isDevelopment ? 'cheap-module-source-map' : 'source-map',
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin()],
-    splitChunks: {
-      cacheGroups: {
-        styles: {
-          name: 'styles',
-          test: /\.css$/,
-          chunks: 'all',
-          enforce: true
-        }
-      }
-    }
+    minimizer: [new TerserPlugin()]
   },
   plugins: [
     new MiniCssExtractPlugin(),
