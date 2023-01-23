@@ -6,6 +6,8 @@ const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { PurgeCSSPlugin } = require('purgecss-webpack-plugin');
 
@@ -68,10 +70,59 @@ module.exports = {
   devtool: isDevelopment ? 'cheap-module-source-map' : 'source-map',
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin()]
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          type: 'css/mini-extract',
+          chunks: 'all',
+          enforce: true
+        }
+      }
+    }
   },
   plugins: [
-    new MiniCssExtractPlugin(),
+    new HtmlWebpackPlugin({
+      inject: false,
+      meta: [
+        {
+          charset: 'utf-8'
+        },
+        {
+          name: 'description',
+          content: 'A personal library to collect and share your favorite quotes from your favorite books.'
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1'
+        }
+      ],
+      favicon: path.join(serverPublicPath, 'favicon.ico'),
+      templateContent: ({ htmlWebpackPlugin }) => `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>ReQuote</title>
+            ${htmlWebpackPlugin.tags.headTags}
+            <link rel="stylesheet" href="/assets/reset.css">
+            <link rel="stylesheet" href="/assets/balloon.min.css">
+            <link rel="stylesheet" href="/assets/fontawesome.min.css">
+          </head>
+          <body class="bg-aqua-blue">
+            <div id="root"></div>
+            <div id="portal-root"></div>
+            ${htmlWebpackPlugin.tags.bodyTags}
+          </body>
+        </html>
+      `,
+      cache: true,
+      lang: 'en-US'
+    }),
+    new MiniCssExtractPlugin({
+      filename: isDevelopment ? '[name].css' : '[name].[contenthash].css',
+      chunkFilename: isDevelopment ? '[id].css' : '[id].[contenthash].css'
+    }),
     new PurgeCSSPlugin({
       paths: glob.sync([
         `${PATHS.css}/**/*`,
