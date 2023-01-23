@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-const { determineSortOrder, determineSortType, verifyJWT, getGoogleBooksIdByISBN } = require('./helpers');
+const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -76,22 +76,23 @@ app.post('/api/save', async (req, res) => {
   const result = await db.query(selectOrInsertBook, params);
   const newQuote = result.rows[0];
   res.status(201).json(newQuote);
-  // code below gets a better description from the Google Books API
+  // code below attempts to get a better description for the book from the Google Books API
   // this can be done after sending a response to the client
-  const gBooksId = await getGoogleBooksIdByISBN(isbn);
-  fetch('https://www.googleapis.com/books/v1/volumes/' + gBooksId)
-    .then(res => res.json())
-    .then(res => {
-      const { description } = res.volumeInfo;
-      const updateDescription = `
-        update "books" as "b"
-           set "description" = $1
-         where "b"."isbn" = $2
-      `;
-      const params = [description, isbn];
-      db.query(updateDescription, params);
-    })
-    .catch(err => console.error(err));
+  const description = await seekImprovedBookDescription(isbn);
+  if (!description) return;
+
+  const updateDescription = `
+    update "books" as "b"
+       set "description" = $1
+     where "b"."isbn" = $2
+  `;
+  const descriptionParams = [description, isbn];
+  try {
+    db.query(updateDescription, descriptionParams);
+  } catch (err) {
+    console.error(err);
+  }
+
 });
 
 app.get('/api/search/:book', async (req, res) => {
