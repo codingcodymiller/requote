@@ -32,7 +32,18 @@ function verifyJWT(jwt) {
 }
 
 async function getGoogleBooksIdByISBN(isbn) {
-  return await fetch('https://www.googleapis.com/books/v1/volumes/?q=isbn:' + isbn).then(res => res.json()).then(res => res?.items[0]?.id);
+  const response = await fetch('https://www.googleapis.com/books/v1/volumes/?q=isbn:' + isbn);
+  const bookResults = await response.json();
+  return bookResults?.items?.[0]?.id;
 }
 
-module.exports = { determineSortOrder, determineSortType, verifyJWT, getGoogleBooksIdByISBN };
+async function seekImprovedBookDescription(bookISBN) {
+  const gBooksId = await getGoogleBooksIdByISBN(bookISBN);
+  if (!gBooksId) return;
+
+  const response = fetch('https://www.googleapis.com/books/v1/volumes/' + gBooksId);
+  const bookData = response.json();
+  return bookData.volumeInfo.description;
+}
+
+module.exports = { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription };
