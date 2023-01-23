@@ -114,7 +114,7 @@ module.exports = {
       chunkFilename: isDevelopment ? '[id].css' : '[id].[contenthash].css'
     }),
     new PurgeCSSPlugin({
-      safelist: [/^glider-/],
+      safelist: [/^glider-/, /^landing-/],
       paths: glob.sync([
         `${PATHS.client}/**/*`,
         `${PATHS.public}/**/*`
