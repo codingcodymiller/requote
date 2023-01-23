@@ -41,8 +41,8 @@ async function seekImprovedBookDescription(bookISBN) {
   const gBooksId = await getGoogleBooksIdByISBN(bookISBN);
   if (!gBooksId) return;
 
-  const response = fetch('https://www.googleapis.com/books/v1/volumes/' + gBooksId);
-  const bookData = response.json();
+  const response = await fetch('https://www.googleapis.com/books/v1/volumes/' + gBooksId);
+  const bookData = await response.json();
   return bookData.volumeInfo.description;
 }
 

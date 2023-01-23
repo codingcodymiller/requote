@@ -117,7 +117,7 @@ module.exports = {
         </html>
       `,
       cache: true,
-      lang: 'en-US'
+      base: '/'
     }),
     new MiniCssExtractPlugin({
       filename: isDevelopment ? '[name].css' : '[name].[contenthash].css',
