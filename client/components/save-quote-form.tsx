@@ -113,7 +113,7 @@ export default function SaveQuoteForm() {
         <p>
           <em>Don't worry, we'll preserve your quote for you until you return</em>
         </p>
-        <a className="btn btn-navy" href="http://localhost:3000/api/login">Login with Google</a>
+        <a className="btn btn-navy" href="/api/login">Login with Google</a>
       </Modal>
     </>
   );
