@@ -1,0 +1,292 @@
+
+
+.quote h1,
+.quote h2,
+.quote h3 {
+  font-family: $font-family-base;
+}
+
+/* UTILITY CLASSES */
+
+.bg-aqua-blue {
+  background-color: #45b2d5;
+}
+
+.bg-lavender-grey {
+  background-color: #f3eaf4;
+}
+
+.text-dark-navy {
+  color: #3a405a;
+}
+
+.text-light-grey {
+  color: #838383;
+}
+
+.text-aqua-blue {
+  color: #45b2d5;
+}
+
+.hover-aqua-blue:hover {
+  color: #45b2d5;
+}
+
+.rounded-border-top {
+  border-radius: 20px 20px 0 0;
+}
+
+.br-10 {
+  border-radius: 10px;
+}
+
+.two-line-truncate {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.top-right {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.top-right-lg {
+  top: 1rem;
+  right: 1.25rem;
+}
+
+.left {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 1rem;
+}
+
+.fill-area {
+  inset: 0;
+}
+
+.tiny-text {
+  font-size: 0.7rem;
+}
+
+.preserve-whitespace {
+  white-space: pre-wrap;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.z-index-10 {
+  z-index: 10;
+}
+
+.hover-grow {
+  transition: transform 0.1s ease-in;
+}
+
+.hover-grow:hover {
+  transform: scale(1.01);
+}
+
+.bg-shadow {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* SEMANTIC CLASSES */
+
+.hyperlink {
+  text-decoration: none;
+}
+
+.hyperlink:hover,
+.hyperlink:focus {
+  text-decoration: underline;
+}
+
+.section-header {
+  border-bottom: 1px solid #838383;
+}
+
+.image-upload-preview {
+  height: 200px;
+}
+
+.image-upload-preview>img {
+  opacity: 0.5;
+  padding: 10px;
+  max-width: 100%;
+  object-fit: contain;
+  border: 1px solid lightgrey;
+}
+
+.btn-navy {
+  color: #fff;
+  background-color: #3a405a;
+  border-color: #3a405a;
+}
+
+.btn-navy:hover {
+  color: #fff;
+  background-color: #41486b;
+  border-color: #41486b;
+}
+
+.dropzone {
+  border-radius: 5px;
+  background-color: white;
+  position: relative;
+}
+
+.dropzone-body {
+  border: 2px dashed #45b2d5;
+  border-radius: 3px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.disabled {
+  opacity: 0.4;
+}
+
+.header-size {
+  height: 5rem;
+}
+
+.mobile-nav {
+  border-top: 1px solid darkgrey;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  height: 80px;
+  z-index: 2;
+}
+
+.main-content {
+  min-height: calc(100vh - 5rem);
+  padding-bottom: 100px;
+}
+
+.logo {
+  width: 100%;
+  max-width: 170px;
+}
+
+.book-img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  object-position: top;
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 1/1.5;
+  object-fit: cover;
+  object-position: top;
+}
+
+.landing-container {
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  z-index: 2;
+}
+
+.landing-floor {
+  top: 65vh;
+  width: 100%;
+  height: 100vh;
+}
+
+.landing-logo {
+  width: 60%;
+  top: 10rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.landing-logo-enter {
+  opacity: 1;
+}
+
+.landing-logo-enter-active {
+  opacity: 0;
+  transition: opacity 500ms linear;
+}
+
+.landing-logo-enter-done {
+  opacity: 0;
+}
+
+.landing-floor-enter * {
+  opacity: 1;
+}
+
+.landing-floor-enter-active {
+  top: 5rem;
+  transition: top 2200ms cubic-bezier(0.3, -0.63, 0.35, 1.04) 500ms;
+}
+
+.landing-floor-enter-active * {
+  opacity: 0;
+  transition: opacity 500ms linear;
+}
+
+.landing-floor-enter-done {
+  top: 5rem;
+}
+
+.landing-floor-enter-done * {
+  opacity: 0;
+}
+
+.landing-image {
+  height: 18rem;
+  transform: translateX(-50%);
+  left: 50%;
+  top: -17rem;
+}
+
+/* MEDIA QUERIES */
+
+@media only screen and (min-width: 600px) {
+  .landing-image {
+    height: 22rem;
+    top: -21rem;
+  }
+
+  .landing-logo {
+    width: 40%;
+  }
+}
+
+@media only screen and (min-width: 750px) {
+  .landing-logo {
+    width: 35%;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .landing-logo {
+    width: 25%;
+  }
+}
+
+@media only screen and (min-width: 1250px) {
+  .landing-logo {
+    width: 20%;
+  }
+}
+
+@media only screen and (min-width: 1800px) {
+  .landing-logo {
+    width: 15%;
+  }
+}
