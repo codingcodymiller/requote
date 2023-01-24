@@ -5,16 +5,17 @@ type InputAttributes = {
   type: string;
   value: string;
   updateValue: Dispatch<SetStateAction<string>>;
+  className?: string;
   id?: string ;
   placeholder?: string;
-  required?: boolean
+  required?: boolean;
 }
 
 export default function FormControlInput(props: InputAttributes) {
-  const { value, updateValue, name, type, required, id, placeholder } = props;
+  const { value, updateValue, name, type, required, id, placeholder, className } = props;
   return (
     <input
-      className="position-relative col-12 p-2 border-1 border-light rounded shadow-sm"
+      className={className || ''}
       value={value}
       name={name}
       type={type}

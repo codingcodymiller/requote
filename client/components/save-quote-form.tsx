@@ -86,6 +86,7 @@ export default function SaveQuoteForm() {
           name="page"
           id="page-number"
           placeholder="Ex: 42"
+          className="position-relative col-12 p-2 border-1 border-light rounded shadow-sm"
           value={page}
           updateValue={updatePage}
         />
