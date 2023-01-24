@@ -69,7 +69,7 @@ app.post('/api/save', async (req, res) => {
       where "token" = $9
     )
     insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "pubQuoteId", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($7), $10, "userId"
+    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($8), $10, "userId"
     from "book"
     full join "existingBook" on true
     join "user" on true
@@ -79,7 +79,7 @@ app.post('/api/save', async (req, res) => {
     await db.query(selectOrInsertBook, params);
     res.status(201);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
   // code below attempts to get a better description for the book from the Google Books API
   // this can be done after sending a response to the client
@@ -110,7 +110,6 @@ app.get('/api/search/:book', async (req, res) => {
   try {
     const response = await fetch(url, config);
     const bookData = await response.json();
-    console.log(bookData);
     bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
     res.status(200).json(bookData.books);
   } catch (err) {
@@ -265,9 +264,14 @@ app.get('/api/book/:isbn', async (req, res) => {
         Authorization: process.env.ISBNDB_KEY
       }
     };
-    const response = await fetch(url, config).then(res => res.json()).catch(err => console.error(err));
-    bookDetails = response.book;
-    bookDetails.description = bookDetails.synopsis;
+    try {
+      const response = await fetch(url, config);
+      const responseData = response.json();
+      bookDetails = responseData.book;
+      bookDetails.description = bookDetails.synopsis;
+    } catch (err) {
+      console.error(err);
+    }
   }
   res.status(200).json(bookDetails);
 });
