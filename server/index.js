@@ -6,6 +6,7 @@ const path = require('path');
 const express = require('express');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
@@ -47,12 +48,14 @@ app.post('/api/save', async (req, res) => {
   }
 
   const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription } = req.body;
+  const publicQuoteId = crypto.randomUUID();
+  const publicBookId = crypto.randomUUID();
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "image", "description", "isbn")
+        ("title", "authors", "image", "description", "isbn", "pubBookId")
       values
-        ($1, $2, $3, $4, $5)
+        ($1, $2, $3, $4, $5, $6)
       on conflict ("isbn")
       do nothing
       returning "bookId"
@@ -63,19 +66,21 @@ app.post('/api/save', async (req, res) => {
     ),
     "user" as (
       select "userId" from "users"
-      where "token" = $8
+      where "token" = $9
     )
-    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $6, $7, to_tsvector($7), "userId"
+    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "pubQuoteId", "userId")
+    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($7), $10, "userId"
     from "book"
     full join "existingBook" on true
     join "user" on true
-    returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, userTokenDecoded.sub];
-  const result = await db.query(selectOrInsertBook, params);
-  const newQuote = result.rows[0];
-  res.status(201).json(newQuote);
+  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, publicBookId, page, quoteText, userTokenDecoded.sub, publicQuoteId];
+  try {
+    await db.query(selectOrInsertBook, params);
+    res.status(201);
+  } catch (err) {
+    console.log(err);
+  }
   // code below attempts to get a better description for the book from the Google Books API
   // this can be done after sending a response to the client
   const description = await seekImprovedBookDescription(isbn);
@@ -131,7 +136,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   const params = [userTokenDecoded.sub];
 
   if (bookId) params.push(bookId);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+  const specificBookCondition = bookId ? 'and "b"."pubBookId" = $' + params.length : '';
 
   if (searchTerm) params.push(searchTerm);
   const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
@@ -143,7 +148,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
      )
      select "q"."page",
             "q"."quoteText",
-            "q"."quoteId",
+            "q"."pubQuoteId",
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
@@ -186,7 +191,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
      )
      select "q"."page",
             "q"."quoteText",
-            "q"."quoteId",
+            "q"."pubQuoteId",
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
@@ -222,7 +227,7 @@ app.get('/api/books', async (req, res) => {
      select distinct "b"."isbn",
             "b"."title",
             "b"."image",
-            "b"."bookId" as "id",
+            "b"."pubBookId" as "id",
             "b"."description"
        from "books" as "b"
        join "quotes" as "q" using ("bookId")
@@ -241,7 +246,7 @@ app.get('/api/book/:isbn', async (req, res) => {
   const getBook = `
      select "b"."title",
             "b"."image",
-            "b"."bookId" as "id",
+            "b"."pubBookId" as "id",
             "b"."isbn",
             "b"."authors",
             "b"."description"
