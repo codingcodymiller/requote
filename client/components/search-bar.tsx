@@ -35,6 +35,7 @@ export default function SearchBar(props: SearchBarProps) {
           type="text"
           name="search"
           id="search-bar"
+          className="position-relative col-12 p-2 border-1 border-light rounded shadow-sm"
           placeholder={placeholder}
           value={searchTerm}
           updateValue={updateSearchTerm}
