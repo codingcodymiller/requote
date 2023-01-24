@@ -61,7 +61,6 @@ export default function SaveQuoteForm() {
         if(res.status === 401){
           throw new Error("Not logged in")
         }
-        return res.json()
       })
       .then(() => {
         sessionStorage.removeItem("quote-to-save")
