@@ -96,7 +96,7 @@ app.post('/api/save', async (req, res) => {
 });
 
 app.get('/api/search/:book', async (req, res) => {
-  const url = `https://api2.isbndb.com/books/${req.params.book}`;
+  const url = `https://api2.isbndb.com/books/${req.params.book}?column=${req.query.type}`;
   const config = {
     headers: {
       Authorization: process.env.ISBNDB_KEY
@@ -105,6 +105,7 @@ app.get('/api/search/:book', async (req, res) => {
   try {
     const response = await fetch(url, config);
     const bookData = await response.json();
+    console.log(bookData);
     bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
     res.status(200).json(bookData.books);
   } catch (err) {
