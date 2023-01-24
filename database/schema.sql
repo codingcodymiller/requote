@@ -13,6 +13,7 @@ CREATE TABLE "public"."quotes" (
 	"page" integer DEFAULT NULL,
 	"bookId" integer NOT NULL,
 	"quoteId" serial NOT NULL,
+  "pubQuoteId" UUID NOT NULL,
 	"userId" integer NOT NULL,
 	CONSTRAINT "quotes_pk" PRIMARY KEY ("quoteId")
 ) WITH (
@@ -23,6 +24,7 @@ CREATE TABLE "public"."quotes" (
 
 CREATE TABLE "public"."books" (
 	"bookId" serial NOT NULL,
+  "pubBookId" UUID NOT NULL,
 	"title" TEXT NOT NULL,
   "authors" TEXT[],
   "image" TEXT NOT NULL,
