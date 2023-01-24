@@ -11,6 +11,7 @@ import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
 import QuoteDashboard from './pages/quote-dashboard'
 import BookDetails from './pages/book-details';
+import PrivacyPolicy from './pages/privacy-policy';
 import './styles/styles.scss'
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes/:bookId" element={<QuoteDashboard />}/>
             <Route path="/book-details/:isbn" element={<BookDetails />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
         </div>
       </main>
