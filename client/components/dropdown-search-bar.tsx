@@ -38,7 +38,7 @@ export default function DropdownSearchBar(props: DropdownSearchBarProps) {
           ""
       }
       <div className="input-group position-relative col-12 border-light shadow-sm">
-        <DropdownButton id="option-target" bsPrefix="btn btn-outline-secondary bg-white rounded-0 rounded-start h-100 px-3" title={selectedOption.label}>
+        <DropdownButton id="option-target" bsPrefix="btn btn-outline-secondary text-muted bg-white rounded-0 rounded-start h-100 px-3" title={selectedOption.label}>
           {optionsList}
         </DropdownButton>
         <FormControlInput
