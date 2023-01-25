@@ -33,7 +33,7 @@ export default function EditQuoteForm({quoteId}: EditProps) {
         if(res.status !== 204){
           throw new Error("Quote edit did not complete successfully")
         }
-        navigate('/quotes')
+        navigate(`/quotes#${quoteId}`)
       })
       .catch(err => {
         console.error(err)

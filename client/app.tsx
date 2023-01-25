@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  Routes,
-  Route
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AppHeader from './components/app-header';
 import Home from './pages/home';
 import Library from './pages/library';
