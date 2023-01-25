@@ -28,7 +28,7 @@ export default function App() {
             <Route path="/edit-quote/:quoteId" element={<EditQuote />} />
             <Route path="/:username/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes" element={<QuoteDashboard />} />
-            <Route path="/quotes/:bookId" element={<QuoteDashboard />}/>
+            <Route path="/quotes/:bookId" element={<QuoteDashboard />} />
             <Route path="/book-details/:isbn" element={<BookDetails />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
