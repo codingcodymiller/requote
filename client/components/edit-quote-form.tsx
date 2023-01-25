@@ -6,7 +6,7 @@ import FormControlInput from './form-control-input';
 import FormControlLabel from './form-control-label';
 
 type QuoteData = {
-  page: number | null;
+  page: string;
   quoteText: string;
 }
 
@@ -19,7 +19,7 @@ export default function EditQuoteForm({quoteId}: EditProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const quoteData = {
-      page,
+      page: page || null,
       quoteText: quote
     };
     fetch(`/api/quote/${quoteId}`, {
@@ -39,7 +39,7 @@ export default function EditQuoteForm({quoteId}: EditProps) {
         console.error(err)
       })
   };
-  const [page, updatePage] = useState<number | null>(null);
+  const [page, updatePage] = useState('');
   const [quote, updateQuote] = useState('')
   useEffect(() => {
     let isComponentMounted = true;
