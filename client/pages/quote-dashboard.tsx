@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
 import { useParams } from 'react-router-dom';
 import SectionHeader from '../components/section-header';
 import BookCarousel from '../components/book-carousel';
@@ -6,6 +6,16 @@ import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list';
 import NoQuotes from '../components/no-quotes';
 import NoResults from '../components/no-results';
+
+export const QuotesContext = React.createContext<QuotesContextValue>({} as QuotesContextValue);
+
+export type QuotesContextValue = {
+  bookId?: string;
+  sortType: string;
+  isReversed: boolean;
+  searchTerm: string;
+  updateQuoteList: Dispatch<SetStateAction<never[]>>
+}
 
 export default function QuoteDashboard () {
   const [searchTerm, updateSearchTerm] = useState('');
@@ -39,10 +49,10 @@ export default function QuoteDashboard () {
     return () => { isComponentMounted = false }
   }, [searchTerm, sortType, isReversed, bookId, username])
 
-
+  const contextValue = { bookId, sortType, searchTerm, isReversed, updateQuoteList }
 
   return (
-    <>
+    <QuotesContext.Provider value={contextValue}>
       <SectionHeader text="Quotes" />
       <BookCarousel />
       <QuoteSearch
@@ -60,6 +70,6 @@ export default function QuoteDashboard () {
             <NoResults /> :
             <NoQuotes />
       }
-    </>
+    </QuotesContext.Provider>
   )
 }
