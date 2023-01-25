@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getCookie } from '../helpers';
+import LoginButton from './login-button';
 
 export default function AppHeader() {
   return (
@@ -26,17 +26,7 @@ export default function AppHeader() {
               Quotes
             </Link>
           </div>
-          {
-            getCookie("user_token")
-            ? <a className="btn btn-navy align-middle d-flex align-items-center" href="/api/logout">
-                <i className="fa-regular fa-right-from-bracket pe-2"></i>
-                Logout
-              </a>
-            : <a className="btn btn-navy align-middle d-flex align-items-center" href="/api/login">
-                <i className="fa-brands fa-google pe-2"></i>
-                Login
-              </a>
-          }
+          <LoginButton />
         </nav>
         <nav className="col-12 d-flex justify-content-evenly align-items-center d-md-none mobile-nav">
           <Link to="/save-quote/book-search" className="text-center text-dark-navy text-decoration-none">
