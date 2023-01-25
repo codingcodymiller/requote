@@ -11,6 +11,7 @@ CREATE TABLE "public"."quotes" (
 	"quoteText" TEXT NOT NULL,
   "quoteVector" TSVECTOR NOT NULL,
 	"page" integer DEFAULT NULL,
+  "isDeleted" BOOLEAN DEFAULT FALSE,
 	"bookId" integer NOT NULL,
 	"quoteId" serial NOT NULL,
   "pubQuoteId" UUID NOT NULL,

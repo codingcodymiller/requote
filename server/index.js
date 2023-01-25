@@ -143,6 +143,30 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
   }
 });
 
+app.patch('/api/delete-quote', async (req, res) => {
+  try {
+    const userTokenDecoded = jwt.decode(req.cookies.user_token);
+    const { quoteId } = req.body;
+    const deleteQuote = `
+      with "user" as (
+        select "userId" from "users"
+        where "token" = $2
+      )
+      update "quotes" as "q"
+        set "isDeleted" = true
+        from "user" as "u"
+      where "q"."userId" = "u"."userId"
+        and "q"."pubQuoteId" = $1
+    `;
+    const params = [quoteId, userTokenDecoded.sub];
+    await db.query(deleteQuote, params);
+    res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
+});
+
 app.get('/api/quotes/:bookId?', async (req, res) => {
   if (!req.cookies.user_token) {
     return res.status(200).json([]);
@@ -182,6 +206,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
        join "books" as "b" using ("bookId")
        join "user" on true
       where "q"."userId" = "user"."userId"
+        and "q"."isDeleted" = false
       ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
@@ -210,7 +235,6 @@ app.get('/api/quote/:quoteId', async (req, res) => {
 });
 
 app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
-
   const { sort, order, searchTerm } = req.query;
   const { username, bookId } = req.params;
 
@@ -242,6 +266,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
        join "books" as "b" using ("bookId")
        join "user" on true
       where "q"."userId" = "user"."userId"
+        and "q"."isDeleted" = false
       ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
@@ -293,6 +318,7 @@ app.get('/api/books', async (req, res) => {
        join "quotes" as "q" using ("bookId")
        join "user" on true
       where "q"."userId" = "user"."userId"
+        and "q"."isDeleted" = false
    order by "b"."title" asc
   `;
   const params = [userTokenDecoded.sub];
