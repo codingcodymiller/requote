@@ -7,6 +7,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
@@ -21,6 +22,20 @@ const db = new pg.Pool({
 const app = express();
 
 const publicPath = path.join(__dirname, 'public');
+
+const sessionData = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {}
+};
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1); // trust first proxy
+  sessionData.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sessionData));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(require('./dev-middleware')(publicPath));
@@ -323,6 +338,7 @@ app.get('/api/book/:isbn', async (req, res) => {
 });
 
 app.get('/api/login', (req, res) => {
+  req.session.originalUrl = req.get('Referrer');
   const queryParams = [
     'response_type=code',
     'access_type=offline',
@@ -367,7 +383,18 @@ app.get('/api/auth', async (req, res) => {
       sameSite: 'lax'
     })
     .status(201)
-    .redirect('/save-quote/form');
+    .redirect(req.session.originalUrl);
+  delete req.session.originalUrl;
+});
+
+app.get('/api/logout', (req, res) => {
+  res.clearCookie('access_token')
+    .clearCookie('username')
+    .clearCookie('user_token', {
+      httpOnly: true,
+      sameSite: 'lax'
+    })
+    .redirect('/');
 });
 
 app.get('/api/*', function (req, res) {
