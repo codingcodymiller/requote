@@ -3,8 +3,8 @@ import React, { Dispatch, SetStateAction } from 'react';
 type InputAttributes = {
   name: string;
   type: string;
-  value: string;
-  updateValue: Dispatch<SetStateAction<string>>;
+  value: any;
+  updateValue: Dispatch<SetStateAction<any>>;
   className?: string;
   id?: string ;
   placeholder?: string;
