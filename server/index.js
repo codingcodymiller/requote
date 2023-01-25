@@ -6,6 +6,7 @@ const path = require('path');
 const express = require('express');
 const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
@@ -47,12 +48,14 @@ app.post('/api/save', async (req, res) => {
   }
 
   const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription } = req.body;
+  const publicQuoteId = crypto.randomUUID();
+  const publicBookId = crypto.randomUUID();
   const selectOrInsertBook = `
     with "book" as (
       insert into "books"
-        ("title", "authors", "image", "description", "isbn")
+        ("title", "authors", "image", "description", "isbn", "pubBookId")
       values
-        ($1, $2, $3, $4, $5)
+        ($1, $2, $3, $4, $5, $6)
       on conflict ("isbn")
       do nothing
       returning "bookId"
@@ -63,19 +66,22 @@ app.post('/api/save', async (req, res) => {
     ),
     "user" as (
       select "userId" from "users"
-      where "token" = $8
+      where "token" = $9
     )
-    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $6, $7, to_tsvector($7), "userId"
+    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "pubQuoteId", "userId")
+    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($8), $10, "userId"
     from "book"
     full join "existingBook" on true
     join "user" on true
-    returning *
   `;
-  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, page, quoteText, userTokenDecoded.sub];
-  const result = await db.query(selectOrInsertBook, params);
-  const newQuote = result.rows[0];
-  res.status(201).json(newQuote);
+  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, publicBookId, page, quoteText, userTokenDecoded.sub, publicQuoteId];
+  try {
+    await db.query(selectOrInsertBook, params);
+    res.sendStatus(201);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
   // code below attempts to get a better description for the book from the Google Books API
   // this can be done after sending a response to the client
   const description = await seekImprovedBookDescription(isbn);
@@ -95,21 +101,30 @@ app.post('/api/save', async (req, res) => {
 
 });
 
-app.get('/api/search/:book', async (req, res) => {
-  const url = `https://api2.isbndb.com/books/${req.params.book}?column=${req.query.type}`;
-  const config = {
-    headers: {
-      Authorization: process.env.ISBNDB_KEY
-    }
-  };
+app.patch('/api/quote/:quoteId', async (req, res) => {
+  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  const { page, quoteText } = req.body;
+  const { quoteId } = req.params;
+  const editQuote = `
+    with "user" as (
+      select "userId" from "users"
+      where "token" = $4
+    )
+    update "quotes" as "q"
+       set "page" = $1,
+           "quoteText" = $2,
+           "quoteVector" = to_tsvector($2)
+      from "user" as "u"
+     where "q"."userId" = "u"."userId"
+       and "q"."pubQuoteId" = $3
+  `;
+  const params = [page, quoteText, quoteId, userTokenDecoded.sub];
   try {
-    const response = await fetch(url, config);
-    const bookData = await response.json();
-    console.log(bookData);
-    bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
-    res.status(200).json(bookData.books);
+    await db.query(editQuote, params);
+    res.sendStatus(204);
   } catch (err) {
     console.error(err);
+    res.status(500).json(err);
   }
 });
 
@@ -131,7 +146,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   const params = [userTokenDecoded.sub];
 
   if (bookId) params.push(bookId);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+  const specificBookCondition = bookId ? 'and "b"."pubBookId" = $' + params.length : '';
 
   if (searchTerm) params.push(searchTerm);
   const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
@@ -143,7 +158,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
      )
      select "q"."page",
             "q"."quoteText",
-            "q"."quoteId",
+            "q"."pubQuoteId" as "quoteId",
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
@@ -160,6 +175,23 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   const quoteList = result.rows;
 
   res.status(200).json(quoteList);
+});
+
+app.get('/api/quote/:quoteId', async (req, res) => {
+  const { quoteId } = req.params;
+
+  const getQuote = `
+       select "q"."page",
+              "q"."quoteText"
+         from "quotes" as "q"
+        where "q"."pubQuoteId" = $1
+  `;
+  const param = [quoteId];
+
+  const result = await db.query(getQuote, param);
+  const quote = result.rows[0];
+
+  res.status(200).json(quote);
 });
 
 app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
@@ -186,7 +218,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
      )
      select "q"."page",
             "q"."quoteText",
-            "q"."quoteId",
+            "q"."pubQuoteId",
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",
             "b"."isbn" as "bookISBN",
@@ -203,6 +235,24 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
   const quoteList = result.rows;
 
   res.status(200).json(quoteList);
+});
+
+app.get('/api/search/:book', async (req, res) => {
+  const url = `https://api2.isbndb.com/books/${req.params.book}?column=${req.query.type}`;
+  const config = {
+    headers: {
+      Authorization: process.env.ISBNDB_KEY
+    }
+  };
+  try {
+    const response = await fetch(url, config);
+    const bookData = await response.json();
+    bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
+    res.status(200).json(bookData.books);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
 });
 
 app.get('/api/books', async (req, res) => {
@@ -222,7 +272,7 @@ app.get('/api/books', async (req, res) => {
      select distinct "b"."isbn",
             "b"."title",
             "b"."image",
-            "b"."bookId" as "id",
+            "b"."pubBookId" as "id",
             "b"."description"
        from "books" as "b"
        join "quotes" as "q" using ("bookId")
@@ -241,7 +291,7 @@ app.get('/api/book/:isbn', async (req, res) => {
   const getBook = `
      select "b"."title",
             "b"."image",
-            "b"."bookId" as "id",
+            "b"."pubBookId" as "id",
             "b"."isbn",
             "b"."authors",
             "b"."description"
@@ -260,9 +310,14 @@ app.get('/api/book/:isbn', async (req, res) => {
         Authorization: process.env.ISBNDB_KEY
       }
     };
-    const response = await fetch(url, config).then(res => res.json()).catch(err => console.error(err));
-    bookDetails = response.book;
-    bookDetails.description = bookDetails.synopsis;
+    try {
+      const response = await fetch(url, config);
+      const responseData = response.json();
+      bookDetails = responseData.book;
+      bookDetails.description = bookDetails.synopsis;
+    } catch (err) {
+      console.error(err);
+    }
   }
   res.status(200).json(bookDetails);
 });

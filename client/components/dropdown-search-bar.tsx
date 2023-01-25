@@ -25,7 +25,7 @@ export default function DropdownSearchBar(props: DropdownSearchBarProps) {
     event.preventDefault();
     props.handleSearchSubmit(searchTerm, selectedOption.value)
   };
-  let optionsList = options.map(option => <Dropdown.Item onClick={() => setSelectedOption(option)} href="#">{option.label}</Dropdown.Item>)
+  let optionsList = options.map(option => <Dropdown.Item key={option.label} onClick={() => setSelectedOption(option)} href="#">{option.label}</Dropdown.Item>)
 
   return (
     <form onSubmit={handleSearchSubmit} className={`${className || ''}`}>

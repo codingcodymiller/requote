@@ -1,14 +1,12 @@
 import React from 'react';
-import {
-  Routes,
-  Route
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AppHeader from './components/app-header';
 import Home from './pages/home';
 import Library from './pages/library';
 import BookSearch from './components/book-search';
 import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
+import EditQuote from './pages/edit-quote'
 import QuoteDashboard from './pages/quote-dashboard'
 import BookDetails from './pages/book-details';
 import PrivacyPolicy from './pages/privacy-policy';
@@ -27,6 +25,7 @@ export default function App() {
               <Route path="book-search" element={<BookSearch />} />
               <Route path="form" element={<SaveQuoteForm />} />
             </Route>
+            <Route path="/edit-quote/:quoteId" element={<EditQuote />} />
             <Route path="/:username/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes/:bookId" element={<QuoteDashboard />}/>
