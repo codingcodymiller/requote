@@ -85,7 +85,7 @@ module.exports = {
         },
         {
           name: 'viewport',
-          content: 'width=device-width, initial-scale=1'
+          content: 'width=device-width, height=device-height, minimum-scale=1.0, initial-scale=1.0'
         }
       ],
       favicon: path.join(serverPublicPath, 'favicon.ico'),
