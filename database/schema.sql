@@ -17,8 +17,6 @@ CREATE TABLE "public"."quotes" (
   "pubQuoteId" UUID NOT NULL,
 	"userId" integer NOT NULL,
 	CONSTRAINT "quotes_pk" PRIMARY KEY ("quoteId")
-) WITH (
-  OIDS=FALSE
 );
 
 
@@ -32,8 +30,6 @@ CREATE TABLE "public"."books" (
   "description" TEXT NOT NULL,
 	"isbn" TEXT UNIQUE NOT NULL,
 	CONSTRAINT "books_pk" PRIMARY KEY ("bookId")
-) WITH (
-  OIDS=FALSE
 );
 
 
@@ -43,8 +39,6 @@ CREATE TABLE "public"."users" (
 	"token" TEXT UNIQUE NOT NULL,
   "username" TEXT UNIQUE NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("userId")
-) WITH (
-  OIDS=FALSE
 );
 
 
