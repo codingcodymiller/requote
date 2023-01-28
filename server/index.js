@@ -371,16 +371,19 @@ app.get('/api/book/:isbn', async (req, res) => {
 
 app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
-  console.log(req.session.originalUrl);
-  const queryParams = [
-    'response_type=code',
-    'access_type=offline',
-    `client_id=${process.env.GOOGLE_CLIENT_ID}`,
-    `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
-    `scope=${encodeURIComponent('openid email profile')}`
-  ];
-  const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + queryParams.join('&');
-  res.redirect(url);
+  req.session.save(function () {
+    console.log(req.session);
+    const queryParams = [
+      'response_type=code',
+      'access_type=offline',
+      `client_id=${process.env.GOOGLE_CLIENT_ID}`,
+      `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
+      `scope=${encodeURIComponent('openid email profile')}`
+    ];
+    const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + queryParams.join('&');
+    res.redirect(url);
+  });
+
 });
 
 app.get('/api/auth', async (req, res) => {
