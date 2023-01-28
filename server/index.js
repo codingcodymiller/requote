@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
@@ -24,10 +25,16 @@ const app = express();
 const publicPath = path.join(__dirname, 'public');
 
 const sessionData = {
+  store: new PgSession({
+    pool: db, // Connection pool
+    tableName: 'user_sessions',
+    createTableIfMissing: true // Use another table-name than the default "session" one
+    // Insert connect-pg-simple options here
+  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: {}
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 };
 
 if (app.get('env') === 'production') {
@@ -35,7 +42,17 @@ if (app.get('env') === 'production') {
   sessionData.cookie.secure = true; // serve secure cookies
 }
 
-app.use(session(sessionData));
+app.use(session({
+  store: new PgSession({
+    pool: db, // Connection pool
+    tableName: 'user_sessions' // Use another table-name than the default "session" one
+    // Insert connect-pg-simple options here
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+
+  saveUninitialized: true
+}));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(require('./dev-middleware')(publicPath));
@@ -353,7 +370,7 @@ app.get('/api/book/:isbn', async (req, res) => {
     };
     try {
       const response = await fetch(url, config);
-      const responseData = response.json();
+      const responseData = await response.json();
       bookDetails = responseData.book;
       bookDetails.description = bookDetails.synopsis;
     } catch (err) {
@@ -365,6 +382,7 @@ app.get('/api/book/:isbn', async (req, res) => {
 
 app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
+  console.log(req.session.originalUrl);
   const queryParams = [
     'response_type=code',
     'access_type=offline',
@@ -401,7 +419,7 @@ app.get('/api/auth', async (req, res) => {
   `;
   const params = [decodedId.sub, username];
   db.query(createNewUser, params);
-
+  console.log(req.session);
   res.cookie('access_token', access_token)
     .cookie('username', username)
     .cookie('user_token', id_token, {
