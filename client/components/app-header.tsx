@@ -5,14 +5,14 @@ import LoginButton from './login-button';
 export default function AppHeader() {
   return (
     <header className="container-fluid py-3 header-size">
-      <div className="row justify-content-between">
-        <div className="col-5 col-sm-4 col-md-3 col-lg-2">
+      <div className="row flex-nowrap justify-content-between">
+        <div className="col">
           <Link to="/">
             <img className="logo" src="/images/logo.svg" alt="ReQuote logo" />
           </Link>
         </div>
-        <nav className="col-6 d-flex justify-content-end align-items-center desktop-nav pe-4">
-          <div className="d-none d-md-block">
+        <nav className="col d-flex justify-content-end align-items-center desktop-nav pe-4">
+          <div className="d-none d-md-block text-no-wrap">
             <Link to="/save-quote/book-search" className="text-dark-navy text-decoration-none px-2">
               <i className="fa-light fa-pen-clip fa-xl m-1 mx-2"></i>
               Save Quote
