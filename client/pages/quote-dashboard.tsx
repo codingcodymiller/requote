@@ -54,7 +54,7 @@ export default function QuoteDashboard () {
   return (
     <QuotesContext.Provider value={contextValue}>
       <SectionHeader text="Quotes" />
-      <BookCarousel />
+      { quoteList.length ? <BookCarousel /> : <></> }
       <QuoteSearch
         sortType={sortType}
         isReversed={isReversed}
