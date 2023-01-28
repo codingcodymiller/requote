@@ -26,10 +26,9 @@ const publicPath = path.join(__dirname, 'public');
 
 const sessionData = {
   store: new PgSession({
-    pool: db, // Connection pool
+    pool: db,
     tableName: 'user_sessions',
-    createTableIfMissing: true // Use another table-name than the default "session" one
-    // Insert connect-pg-simple options here
+    createTableIfMissing: true
   }),
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -42,17 +41,7 @@ if (app.get('env') === 'production') {
   sessionData.cookie.secure = true; // serve secure cookies
 }
 
-app.use(session({
-  store: new PgSession({
-    pool: db, // Connection pool
-    tableName: 'user_sessions' // Use another table-name than the default "session" one
-    // Insert connect-pg-simple options here
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-
-  saveUninitialized: true
-}));
+app.use(session(sessionData));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(require('./dev-middleware')(publicPath));
