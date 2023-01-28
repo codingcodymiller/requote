@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
 const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
@@ -24,10 +25,15 @@ const app = express();
 const publicPath = path.join(__dirname, 'public');
 
 const sessionData = {
+  store: new PgSession({
+    pool: db,
+    tableName: 'user_sessions',
+    createTableIfMissing: true
+  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: {}
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 };
 
 if (app.get('env') === 'production') {
@@ -353,7 +359,7 @@ app.get('/api/book/:isbn', async (req, res) => {
     };
     try {
       const response = await fetch(url, config);
-      const responseData = response.json();
+      const responseData = await response.json();
       bookDetails = responseData.book;
       bookDetails.description = bookDetails.synopsis;
     } catch (err) {
@@ -365,15 +371,19 @@ app.get('/api/book/:isbn', async (req, res) => {
 
 app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
-  const queryParams = [
-    'response_type=code',
-    'access_type=offline',
-    `client_id=${process.env.GOOGLE_CLIENT_ID}`,
-    `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
-    `scope=${encodeURIComponent('openid email profile')}`
-  ];
-  const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + queryParams.join('&');
-  res.redirect(url);
+  req.session.save(function () {
+    console.log(req.session);
+    const queryParams = [
+      'response_type=code',
+      'access_type=offline',
+      `client_id=${process.env.GOOGLE_CLIENT_ID}`,
+      `redirect_uri=${process.env.GOOGLE_REDIRECT_URL}`,
+      `scope=${encodeURIComponent('openid email profile')}`
+    ];
+    const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + queryParams.join('&');
+    res.redirect(url);
+  });
+
 });
 
 app.get('/api/auth', async (req, res) => {
@@ -401,7 +411,7 @@ app.get('/api/auth', async (req, res) => {
   `;
   const params = [decodedId.sub, username];
   db.query(createNewUser, params);
-
+  console.log(req.session);
   res.cookie('access_token', access_token)
     .cookie('username', username)
     .cookie('user_token', id_token, {

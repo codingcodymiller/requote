@@ -20,8 +20,6 @@ export default function BookCarousel () {
     return () => { isComponentMounted = false }
   }, [])
 
-  if(!bookList.length) return <></>;
-
   const bookSlides = bookList.map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} className="px-1" />);
   bookSlides.unshift(<BookCover title="All Books" image="/images/all-books-graphic.jpg" key="all-books" />)
   return (

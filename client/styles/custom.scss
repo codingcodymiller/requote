@@ -76,6 +76,10 @@
   white-space: pre-wrap;
 }
 
+.text-no-wrap {
+  white-space: nowrap;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
@@ -165,7 +169,7 @@
   -webkit-backface-visibility: hidden;
   bottom: 0;
   height: 80px;
-  z-index: 2;
+  z-index: 200;
 }
 
 .main-content {
@@ -201,14 +205,14 @@
 }
 
 .landing-floor {
-  top: 65vh;
+  top: 60vh;
   width: 100%;
   height: 100vh;
 }
 
 .landing-logo {
   width: 60%;
-  top: 10rem;
+  top: 6rem;
   left: 50%;
   transform: translate(-50%, -50%);
 }

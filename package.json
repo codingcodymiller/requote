@@ -21,6 +21,7 @@
     "@types/tinymce": "^4.6.5",
     "argon2": "^0.30.3",
     "bootstrap": "^5.2.3",
+    "connect-pg-simple": "^8.0.0",
     "cookie-parser": "^1.4.6",
     "dompurify": "^2.4.3",
     "dotenv": "^16.0.3",
