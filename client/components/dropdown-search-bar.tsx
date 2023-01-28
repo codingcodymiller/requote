@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, Dispatch, SetStateAction } from 'react';
 import FormControlInput from './form-control-input';
 import FormControlLabel from './form-control-label';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -10,22 +10,29 @@ export type Option = {
   placeholder?: string;
 }
 
+export type OptionStore = {
+  [key: string]: Option;
+}
+
 type DropdownSearchBarProps = {
   label?: string;
   className?: string;
-  options: Option[];
+  options: OptionStore;
+  selectedOption: Option;
+  searchTerm: string;
+  setSelectedOption: Dispatch<SetStateAction<Option>>;
+  updateSearchTerm: Dispatch<SetStateAction<string>>;
   handleSearchSubmit: (searchTerm: string, option: string) => void;
 }
 
 export default function DropdownSearchBar(props: DropdownSearchBarProps) {
-  const { label, className, options } = props;
-  const [searchTerm, updateSearchTerm] = useState('')
-  const [selectedOption, setSelectedOption] = useState(options[0])
+  const { label, className, options, selectedOption, setSelectedOption, searchTerm, updateSearchTerm } = props;
+
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     props.handleSearchSubmit(searchTerm, selectedOption.value)
   };
-  let optionsList = options.map(option => <Dropdown.Item key={option.label} onClick={() => setSelectedOption(option)} href="#">{option.label}</Dropdown.Item>)
+  let optionsList = Object.values(options).map(option => <Dropdown.Item key={option.label} onClick={() => setSelectedOption(option)} href="#">{option.label}</Dropdown.Item>)
 
   return (
     <form onSubmit={handleSearchSubmit} className={`${className || ''}`}>
