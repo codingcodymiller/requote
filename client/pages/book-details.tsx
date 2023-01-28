@@ -26,7 +26,7 @@ export default function BookDetails(){
       });
 
     return () => { isComponentMounted = false }
-  })
+  }, [isbn])
 
   return (
     <>
