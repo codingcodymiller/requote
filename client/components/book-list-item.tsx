@@ -11,7 +11,7 @@ export default function BookListItem(props: SingleBookProps) {
   const selectedBookData: BookDataContextValue = useContext(SelectedBookContext);
   const navigate = useNavigate();
   const book: BookData = props.book;
-  const [src, updateSrc] = useState(book.image)
+  const [src, updateSrc] = useState(book.image);
   book.authors = formatAuthorNames(book.authors);
   return (
     <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={e => {

@@ -10,7 +10,8 @@ type ResultsListProps = {
 
 export default function ResultList(props: ResultsListProps) {
   if (!props.results.length && props.searchTerm) return <NoResults />;
-  const results = props.results.map((book: BookData) => <BookListItem book={book} key={book.isbn} />);
+  const results = props.results
+    .map((book: BookData) => <BookListItem book={book} key={book.isbn} />);
 
   return (
     <div className="row">

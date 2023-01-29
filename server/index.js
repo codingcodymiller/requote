@@ -11,7 +11,13 @@ const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./error-middleware');
-const { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription } = require('./helpers');
+const {
+  determineSortOrder,
+  determineSortType,
+  verifyJWT,
+  seekImprovedBookDescription,
+  urlExists
+} = require('./helpers');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -103,21 +109,36 @@ app.post('/api/save', async (req, res) => {
     console.error(err);
     res.status(500).json(err);
   }
-  // code below attempts to get a better description for the book from the Google Books API
-  // this can be done after sending a response to the client
-  const description = await seekImprovedBookDescription(isbn);
-  if (!description) return;
+  // code below attempts to get a better image for the book from the OpenLibrary Book Covers API
+  const imageExists = urlExists(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`);
+  if (imageExists) {
+    const updateImage = `
+      update "books" as "b"
+         set "image" = $1
+       where "b"."isbn" = $2
+    `;
+    const imageParams = [`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`, isbn];
+    try {
+      db.query(updateImage, imageParams);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-  const updateDescription = `
-    update "books" as "b"
-       set "description" = $1
-     where "b"."isbn" = $2
-  `;
-  const descriptionParams = [description, isbn];
-  try {
-    db.query(updateDescription, descriptionParams);
-  } catch (err) {
-    console.error(err);
+  // code below attempts to get a better description for the book from the Google Books API
+  const description = seekImprovedBookDescription(isbn);
+  if (description) {
+    const updateDescription = `
+      update "books" as "b"
+         set "description" = $1
+       where "b"."isbn" = $2
+    `;
+    const descriptionParams = [description, isbn];
+    try {
+      db.query(updateDescription, descriptionParams);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
 });
@@ -284,7 +305,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
 });
 
 app.get('/api/search/:book', async (req, res) => {
-  const url = `https://api2.isbndb.com/books/${req.params.book}?column=${req.query.type}`;
+  const url = `https://api2.isbndb.com/books/${req.params.book}?column=${req.query.type}&pageSize=50`;
   const config = {
     headers: {
       Authorization: process.env.ISBNDB_KEY
@@ -293,7 +314,9 @@ app.get('/api/search/:book', async (req, res) => {
   try {
     const response = await fetch(url, config);
     const bookData = await response.json();
-    bookData.books = bookData.books ? bookData.books.filter(book => book.authors && (book.description = book.synopsis)) : [];
+    bookData.books = bookData.books
+      ? bookData.books.filter(book => book.authors && (book.description = book.synopsis))
+      : [];
     res.status(200).json(bookData.books);
   } catch (err) {
     console.error(err);
@@ -372,7 +395,6 @@ app.get('/api/book/:isbn', async (req, res) => {
 app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
   req.session.save(function () {
-    console.log(req.session);
     const queryParams = [
       'response_type=code',
       'access_type=offline',
@@ -411,7 +433,6 @@ app.get('/api/auth', async (req, res) => {
   `;
   const params = [decodedId.sub, username];
   db.query(createNewUser, params);
-  console.log(req.session);
   res.cookie('access_token', access_token)
     .cookie('username', username)
     .cookie('user_token', id_token, {
