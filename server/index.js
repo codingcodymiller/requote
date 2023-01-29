@@ -396,6 +396,7 @@ app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
   req.session.save(function () {
     const queryParams = [
+      'prompt=consent',
       'response_type=code',
       'access_type=offline',
       `client_id=${process.env.GOOGLE_CLIENT_ID}`,
@@ -455,6 +456,9 @@ app.get('/api/logout', (req, res) => {
 });
 
 app.get('/api/username-available', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
+  }
   const { username } = req.query;
   const checkIfUserExists = `
     select * from "users"
@@ -466,6 +470,33 @@ app.get('/api/username-available', async (req, res) => {
     res.status(200).json({ available: false });
   } else {
     res.status(200).json({ available: true });
+  }
+});
+
+app.patch('/api/change-username', async (req, res) => {
+  const { user_token: userToken, username } = req.cookies;
+  const { username: newUsername } = req.body;
+  if (!userToken) {
+    return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
+  }
+  const userTokenDecoded = jwt.decode(userToken);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(403).json({ message: 'Invalid login.' });
+  }
+
+  try {
+    const updateUsername = `
+      update "users" as "u"
+        set "username" = $1
+      where "u"."username" = $2
+        and "u"."token" = $3
+    `;
+    const params = [newUsername, username, userTokenDecoded.sub];
+    const response = await db.query(updateUsername, params);
+    console.log(response);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(403).json({ message: 'Username is already taken' });
   }
 });
 
