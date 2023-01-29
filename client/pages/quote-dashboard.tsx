@@ -4,6 +4,7 @@ import SectionHeader from '../components/section-header';
 import BookCarousel from '../components/book-carousel';
 import QuoteSearch from '../components/quote-search';
 import QuoteList from '../components/quote-list';
+import { QuoteData } from '../components/quote-list-item';
 import NoQuotes from '../components/no-quotes';
 import NoResults from '../components/no-results';
 
@@ -14,6 +15,7 @@ export type QuotesContextValue = {
   sortType: string;
   isReversed: boolean;
   searchTerm: string;
+  quoteList: QuoteData[];
   updateQuoteList: Dispatch<SetStateAction<never[]>>
 }
 
@@ -49,7 +51,7 @@ export default function QuoteDashboard () {
     return () => { isComponentMounted = false }
   }, [searchTerm, sortType, isReversed, bookId, username])
 
-  const contextValue = { bookId, sortType, searchTerm, isReversed, updateQuoteList }
+  const contextValue = { bookId, sortType, searchTerm, isReversed, quoteList, updateQuoteList }
 
   return (
     <QuotesContext.Provider value={contextValue}>
