@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 function determineSortOrder(requestedOrder) {
   switch (requestedOrder) {
     case 'ascending':
@@ -46,4 +48,9 @@ async function seekImprovedBookDescription(bookISBN) {
   return bookData.volumeInfo.description;
 }
 
-module.exports = { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription };
+async function urlExists(url) {
+  const response = await fetch(url);
+  return response.status !== 404;
+}
+
+module.exports = { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription, urlExists };
