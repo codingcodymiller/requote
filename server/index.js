@@ -454,6 +454,21 @@ app.get('/api/logout', (req, res) => {
     .redirect('/');
 });
 
+app.get('/api/username-available', async (req, res) => {
+  const { username } = req.query;
+  const checkIfUserExists = `
+    select * from "users"
+    where "username" = $1
+  `;
+  const params = [username];
+  const response = await db.query(checkIfUserExists, params);
+  if (response.rows.length) {
+    res.status(200).json({ available: false });
+  } else {
+    res.status(200).json({ available: true });
+  }
+});
+
 app.get('/api/*', function (req, res) {
   res.status(404).json({ message: 'API Endpoint does not exist' });
 });
