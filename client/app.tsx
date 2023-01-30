@@ -25,7 +25,7 @@ export default function App() {
   const contextValue = { username, updateUsername }
   return (
     <UserContext.Provider value={ contextValue }>
-      <AppHeader username={username} />
+      <AppHeader />
       <main className="bg-lavender-grey rounded-border-top main-content">
         <div className="container">
           <Routes>
