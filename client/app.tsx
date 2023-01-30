@@ -9,6 +9,7 @@ import SaveQuoteForm from './components/save-quote-form';
 import EditQuote from './pages/edit-quote'
 import QuoteDashboard from './pages/quote-dashboard'
 import BookDetails from './pages/book-details';
+import AccountSettings from './pages/account-settings';
 import PrivacyPolicy from './pages/privacy-policy';
 import { getCookie } from './helpers';
 import './styles/styles.scss'
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes/:bookId" element={<QuoteDashboard />} />
             <Route path="/book-details/:isbn" element={<BookDetails />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
         </div>
