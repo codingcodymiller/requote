@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef, MutableRefObject } from "react";
 import { UserContext } from "../app";
 
 export default function ChangeUsernameForm(){
@@ -7,10 +7,15 @@ export default function ChangeUsernameForm(){
   const [isFormClean, updateFormCleanliness] = useState(true);
   const [isValid, updateValidity] = useState(true);
   const [message, updateMessage] = useState('');
+  const usernameInput: MutableRefObject<HTMLInputElement> = useRef({} as HTMLInputElement);
 
   const handleInput = (e: { target: { value: string; }; }) => {
     updateUsernameValue(e.target.value)
-    updateFormCleanliness(false);
+    if(e.target.value){
+      updateFormCleanliness(false);
+    } else {
+      updateFormCleanliness(true);
+    }
   }
 
   const changeUsername = () => {
@@ -24,17 +29,19 @@ export default function ChangeUsernameForm(){
         throw new Error(res.message);
       }
       updateValidity(true);
-      updateMessage('Your username has been updated!')
-      updateUsername(usernameValue)
+      usernameInput.current.setCustomValidity('')
+      updateMessage('Your username has been updated!');
+      updateUsername(usernameValue);
       setTimeout(() => {
-        updateFormCleanliness(true)
-        updateUsernameValue('')
+        updateFormCleanliness(true);
+        updateUsernameValue('');
       }, 1000)
     })
     .catch(err => {
       updateValidity(false);
-      updateMessage('The username that was submitted is already taken, please try a different username.')
-      console.error("Username submission error:", err)
+      usernameInput.current.setCustomValidity('invalid');
+      updateMessage('The username that was submitted is already taken, please try a different username.');
+      console.error("Username submission error:", err);
     })
   }
 
@@ -46,41 +53,45 @@ export default function ChangeUsernameForm(){
         .then(res => {
           if (res.available) {
             updateValidity(true);
-            updateMessage('That username is available!')
+            usernameInput.current.setCustomValidity('');
+            updateMessage('That username is available!');
           } else {
             updateValidity(false);
-            updateMessage('That username is already taken.')
+            usernameInput.current.setCustomValidity('invalid');
+            updateMessage('That username is already taken.');
           }
         })
         .catch(err => {
-          console.error("Username availability error:", err)
+          console.error("Username availability error:", err);
         })
     }, 300)
-    return () => clearTimeout(timeoutId)
+    return () => clearTimeout(timeoutId);
   }, [usernameValue])
 
   return (
     <form className={`col-12 mb-3 ${isFormClean ? '' : 'was-validated' }`} onSubmit={changeUsername} noValidate>
-      <label htmlFor="username" className="form-label">First name</label>
-      <div className={`input-group has-validation ${isValid ? 'is-valid' : 'is-invalid'}`}>
+      <label htmlFor="new-username" className="ps-1 form-label">Change Username</label>
+      <div className={`input-group has-validation`}>
         <input
           type="text"
+          ref={usernameInput}
           value={usernameValue}
           onChange={handleInput}
-          className="form-control"
-          id="username"
-          placeholder="New username"
-          aria-label="New username"
+          className={`form-control ${isFormClean ? '' : isValid ? 'is-valid' : 'is-invalid'}`}
+          id="new-username"
+          placeholder="New Username"
+          aria-label="New Username"
           aria-describedby="button-addon"
           required
         />
-        <button className="btn btn-primary" type="button" id="button-addon">Button</button>
-        <div className="valid-feedback">
-          {message}
-        </div>
-        <div className="invalid-feedback">
-          {message}
-        </div>
+        <button className="btn btn-navy rounded-end" type="button" id="button-addon">Submit</button>
+        {
+          isFormClean
+          ? <></>
+          : isValid
+            ? <div className="valid-feedback is-valid">{message}</div>
+            : <div className="invalid-feedback is-invalid">{message}</div>
+        }
       </div>
     </form>
   )
