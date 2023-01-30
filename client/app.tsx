@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AppHeader from './components/app-header';
 import Home from './pages/home';
@@ -10,12 +10,22 @@ import EditQuote from './pages/edit-quote'
 import QuoteDashboard from './pages/quote-dashboard'
 import BookDetails from './pages/book-details';
 import PrivacyPolicy from './pages/privacy-policy';
+import { getCookie } from './helpers';
 import './styles/styles.scss'
 
+export const UserContext = React.createContext<UserContextValue>({} as UserContextValue);
+
+export type UserContextValue = {
+  username: string;
+  updateUsername: Dispatch<SetStateAction<string>>;
+}
+
 export default function App() {
+  const [username, updateUsername] = useState(getCookie('username') || '')
+  const contextValue = { username, updateUsername }
   return (
-    <>
-      <AppHeader />
+    <UserContext.Provider value={ contextValue }>
+      <AppHeader username={username} />
       <main className="bg-lavender-grey rounded-border-top main-content">
         <div className="container">
           <Routes>
@@ -34,6 +44,6 @@ export default function App() {
           </Routes>
         </div>
       </main>
-    </>
+    </UserContext.Provider>
   );
 }
