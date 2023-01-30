@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
+const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 const errorMiddleware = require('./error-middleware');
 const {
   determineSortOrder,
@@ -424,18 +425,30 @@ app.get('/api/auth', async (req, res) => {
   // eslint-disable-next-line camelcase
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
-  const username = decodedId.email.split('@')[0];
+
+  const username = uniqueNamesGenerator({
+    dictionaries: [adjectives, colors, animals],
+    separator: '',
+    style: 'capital'
+  });
 
   const createNewUser = `
-    insert into "users" ("token", "username")
-    values ($1, $2)
-    on conflict ("token")
-    do nothing
+    with "newUser" as (
+      insert into "users" ("token", "username")
+      values ($1, $2)
+      on conflict ("token") do nothing
+      returning *
+    )
+    select * from "newUser"
+    union
+      select * from "users"
+      where "token" = $1
   `;
   const params = [decodedId.sub, username];
-  db.query(createNewUser, params);
+  const userResponse = await db.query(createNewUser, params);
+  const userData = userResponse.rows[0];
   res.cookie('access_token', access_token)
-    .cookie('username', username)
+    .cookie('username', userData.username)
     .cookie('user_token', id_token, {
       httpOnly: true,
       sameSite: 'lax'
@@ -494,7 +507,7 @@ app.patch('/api/change-username', async (req, res) => {
     const params = [newUsername, username, userTokenDecoded.sub];
     const response = await db.query(updateUsername, params);
     console.log(response);
-    res.sendStatus(204);
+    res.cookie('username', newUsername).sendStatus(204);
   } catch (err) {
     res.status(403).json({ message: 'Username is already taken' });
   }
