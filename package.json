@@ -39,7 +39,8 @@
     "react-glider": "^4.0.2",
     "react-router-dom": "^6.6.1",
     "react-transition-group": "^4.4.5",
-    "tesseract.js": "^4.0.2"
+    "tesseract.js": "^4.0.2",
+    "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
