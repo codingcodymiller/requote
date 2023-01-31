@@ -487,7 +487,7 @@ app.get('/api/username-available', async (req, res) => {
 });
 
 app.patch('/api/change-username', async (req, res) => {
-  const { user_token: userToken, username } = req.cookies;
+  const { user_token: userToken } = req.cookies;
   const { username: newUsername } = req.body;
   if (!userToken) {
     return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
@@ -501,14 +501,13 @@ app.patch('/api/change-username', async (req, res) => {
     const updateUsername = `
       update "users" as "u"
         set "username" = $1
-      where "u"."username" = $2
-        and "u"."token" = $3
+      where "u"."token" = $2
     `;
-    const params = [newUsername, username, userTokenDecoded.sub];
-    const response = await db.query(updateUsername, params);
-    console.log(response);
-    res.cookie('username', newUsername).sendStatus(204);
+    const params = [newUsername, userTokenDecoded.sub];
+    await db.query(updateUsername, params);
+    res.cookie('username', newUsername).status(200).json({ message: 'Username updated succesfully' });
   } catch (err) {
+    console.log(err);
     res.status(403).json({ message: 'Username is already taken' });
   }
 });
