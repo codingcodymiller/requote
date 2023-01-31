@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef, MutableRefObject } from "react";
+import React, { useState, useContext, useEffect, useRef, MutableRefObject, FormEvent } from "react";
 import { UserContext } from "../app";
 
 export default function ChangeUsernameForm(){
@@ -18,31 +18,37 @@ export default function ChangeUsernameForm(){
     }
   }
 
-  const changeUsername = () => {
+  const changeUsername = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     fetch('/api/change-username', {
       method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
       body: JSON.stringify({ username: usernameValue })
     })
-    .then(res => res.json())
-    .then(res => {
-      if(res.status !== 204) {
-        throw new Error(res.message);
-      }
-      updateValidity(true);
-      usernameInput.current.setCustomValidity('')
-      updateMessage('Your username has been updated!');
-      updateUsername(usernameValue);
-      setTimeout(() => {
-        updateFormCleanliness(true);
-        updateUsernameValue('');
-      }, 1000)
-    })
-    .catch(err => {
-      updateValidity(false);
-      usernameInput.current.setCustomValidity('invalid');
-      updateMessage('The username that was submitted is already taken, please try a different username.');
-      console.error("Username submission error:", err);
-    })
+      .then(res => res.json().then(resData => ({ status: res.status, message: resData.message})))
+      .then(res => {
+        if(res.status !== 200){
+          throw new Error(res.message)
+        }
+        updateValidity(true);
+        usernameInput.current.setCustomValidity('')
+        updateMessage('Your username has been updated!');
+        updateUsername(usernameValue);
+        setTimeout(() => {
+          updateFormCleanliness(true);
+          updateUsernameValue('');
+        }, 3000)
+      })
+      .catch(err => {
+        console.error(err);
+        updateValidity(false);
+        usernameInput.current.setCustomValidity('invalid');
+        updateMessage('The username that was submitted is already taken, please try a different username.');
+        console.error("Username submission error:", err);
+      })
   }
 
   useEffect(() => {
@@ -84,7 +90,7 @@ export default function ChangeUsernameForm(){
           aria-describedby="button-addon"
           required
         />
-        <button className="btn btn-navy rounded-end" type="button" id="button-addon">Submit</button>
+        <button className="btn btn-navy rounded-end" type="submit" id="button-addon">Submit</button>
         {
           isFormClean
           ? <></>
