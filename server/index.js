@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
+const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 const errorMiddleware = require('./error-middleware');
 const {
   determineSortOrder,
@@ -396,6 +397,7 @@ app.get('/api/login', (req, res) => {
   req.session.originalUrl = req.get('Referrer');
   req.session.save(function () {
     const queryParams = [
+      'prompt=consent',
       'response_type=code',
       'access_type=offline',
       `client_id=${process.env.GOOGLE_CLIENT_ID}`,
@@ -423,18 +425,30 @@ app.get('/api/auth', async (req, res) => {
   // eslint-disable-next-line camelcase
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
-  const username = decodedId.email.split('@')[0];
+
+  const username = uniqueNamesGenerator({
+    dictionaries: [adjectives, colors, animals],
+    separator: '',
+    style: 'capital'
+  });
 
   const createNewUser = `
-    insert into "users" ("token", "username")
-    values ($1, $2)
-    on conflict ("token")
-    do nothing
+    with "newUser" as (
+      insert into "users" ("token", "username")
+      values ($1, $2)
+      on conflict ("token") do nothing
+      returning *
+    )
+    select * from "newUser"
+    union
+      select * from "users"
+      where "token" = $1
   `;
   const params = [decodedId.sub, username];
-  db.query(createNewUser, params);
+  const userResponse = await db.query(createNewUser, params);
+  const userData = userResponse.rows[0];
   res.cookie('access_token', access_token)
-    .cookie('username', username)
+    .cookie('username', userData.username)
     .cookie('user_token', id_token, {
       httpOnly: true,
       sameSite: 'lax'
@@ -452,6 +466,50 @@ app.get('/api/logout', (req, res) => {
       sameSite: 'lax'
     })
     .redirect('/');
+});
+
+app.get('/api/username-available', async (req, res) => {
+  if (!req.cookies.user_token) {
+    return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
+  }
+  const { username } = req.query;
+  const checkIfUserExists = `
+    select * from "users"
+    where "username" = $1
+  `;
+  const params = [username];
+  const response = await db.query(checkIfUserExists, params);
+  if (response.rows.length) {
+    res.status(200).json({ available: false });
+  } else {
+    res.status(200).json({ available: true });
+  }
+});
+
+app.patch('/api/change-username', async (req, res) => {
+  const { user_token: userToken } = req.cookies;
+  const { username: newUsername } = req.body;
+  if (!userToken) {
+    return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
+  }
+  const userTokenDecoded = jwt.decode(userToken);
+  if (!verifyJWT(userTokenDecoded)) {
+    return res.status(403).json({ message: 'Invalid login.' });
+  }
+
+  try {
+    const updateUsername = `
+      update "users" as "u"
+        set "username" = $1
+      where "u"."token" = $2
+    `;
+    const params = [newUsername, userTokenDecoded.sub];
+    await db.query(updateUsername, params);
+    res.cookie('username', newUsername).status(200).json({ message: 'Username updated succesfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(403).json({ message: 'Username is already taken' });
+  }
 });
 
 app.get('/api/*', function (req, res) {

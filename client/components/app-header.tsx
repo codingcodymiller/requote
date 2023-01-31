@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LoginButton from './login-button';
+import LoginOrProfile from './login-or-profile';
 
 export default function AppHeader() {
   return (
@@ -26,7 +26,7 @@ export default function AppHeader() {
               Quotes
             </Link>
           </div>
-          <LoginButton />
+          <LoginOrProfile />
         </nav>
         <nav className="col-12 d-flex justify-content-evenly align-items-center d-md-none mobile-nav">
           <Link to="/save-quote/book-search" className="text-center text-dark-navy text-decoration-none">
