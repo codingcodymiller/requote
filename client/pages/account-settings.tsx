@@ -10,9 +10,11 @@ export default function AccountSettings() {
   return (
     <>
       <SectionHeader text={`${username} Account Settings`} />
-      <ChangeUsernameForm />
-      <div className="d-flex my-5 justify-content-center">
-        <LogoutButton />
+      <div className="row justify-content-center align-items-center">
+        <ChangeUsernameForm />
+        <div className="col-12 my-5 d-flex justify-content-center">
+          <LogoutButton />
+        </div>
       </div>
     </>
   )
