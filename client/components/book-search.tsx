@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DropdownSearchBar, { Option, OptionStore } from './dropdown-search-bar';
+import LoadingSpinner from './loading-spinner';
 import ResultList from './result-list';
 
 export const BookSearchContext = React.createContext<SearchContextValue>({} as SearchContextValue);
@@ -23,19 +24,19 @@ export default function BookSearch() {
     }
   }
   const [results, updateResults] = useState([]);
+  const [isLoading, setLoadingStatus] = useState(false);
   const sessionSearchTerm = sessionStorage.getItem("book-search-term");
   const sessionSearchOption = sessionStorage.getItem("book-search-option")
   const [searchTerm, updateSearchTerm] = useState(sessionSearchTerm || "")
   const [selectedOption, setSelectedOption] = useState(options[sessionSearchOption || "title"])
+
   const searchBooks = (searchTerm: string, option: string) => {
+    setLoadingStatus(true);
     fetch(`/api/search/${encodeURIComponent(`"${searchTerm}"`)}?type=${option}`)
+      .then(res => res.json())
       .then(res => {
-        debugger;
-        return res.json()
-      })
-      .then(res => {
-        debugger;
-        updateResults(res)
+        updateResults(res);
+        setLoadingStatus(false);
       });
   }
   if (sessionSearchTerm && sessionSearchOption){
@@ -58,7 +59,11 @@ export default function BookSearch() {
         setSelectedOption={setSelectedOption}
         updateSearchTerm={updateSearchTerm}
         handleSearchSubmit={searchBooks} />
-      <ResultList results={results} searchTerm={searchTerm} />
+      {
+        isLoading
+          ? <LoadingSpinner />
+          : <ResultList results={results} searchTerm={searchTerm} />
+      }
     </BookSearchContext.Provider>
   );
 }

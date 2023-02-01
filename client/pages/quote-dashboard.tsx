@@ -7,6 +7,7 @@ import QuoteList from '../components/quote-list';
 import { QuoteData } from '../components/quote-list-item';
 import NoQuotes from '../components/no-quotes';
 import NoResults from '../components/no-results';
+import LoadingSpinner from '../components/loading-spinner';
 
 export const QuotesContext = React.createContext<QuotesContextValue>({} as QuotesContextValue);
 
@@ -24,6 +25,7 @@ export default function QuoteDashboard () {
   const [sortType, updateSortType] = useState('date');
   const [isReversed, updateIsReversed] = useState(false);
   const [quoteList, updateQuoteList] = useState([]);
+  const [isLoading, setLoadingStatus] = useState(true);
   const { bookId, username } = useParams();
 
   useEffect(() => {
@@ -42,7 +44,8 @@ export default function QuoteDashboard () {
     .then(res => res.json())
     .then(res => {
       if (!isComponentMounted) return;
-      updateQuoteList(res)
+      updateQuoteList(res);
+      setLoadingStatus(false);
     })
     .catch(err => {
       console.error("error:", err)
@@ -52,7 +55,6 @@ export default function QuoteDashboard () {
   }, [searchTerm, sortType, isReversed, bookId, username])
 
   const contextValue = { bookId, sortType, searchTerm, isReversed, quoteList, updateQuoteList }
-
   return (
     <QuotesContext.Provider value={contextValue}>
       <SectionHeader text="Quotes" />
@@ -68,9 +70,11 @@ export default function QuoteDashboard () {
       {
         quoteList.length > 0 ?
           <QuoteList quotes={quoteList} /> :
-          searchTerm ?
-            <NoResults /> :
-            <NoQuotes />
+          isLoading ?
+            <LoadingSpinner /> :
+            searchTerm ?
+              <NoResults /> :
+              <NoQuotes />
       }
     </QuotesContext.Provider>
   )
