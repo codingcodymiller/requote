@@ -75,14 +75,18 @@ export default function ChangeUsernameForm(){
   }, [usernameValue])
 
   return (
-    <form className={`col-12 mb-3 ${isFormClean ? '' : 'was-validated' }`} onSubmit={changeUsername} noValidate>
-      <label htmlFor="new-username" className="ps-1 form-label">Change Username</label>
+    <form className={`col-10 col-md-8 col-lg-6 pb-3 mx-1 my-3 section-header text-center ${isFormClean ? '' : 'was-validated' }`} onSubmit={changeUsername} noValidate>
+      <label htmlFor="new-username" className="ps-1 form-label">
+        Change Username
+        <span className="text-secondary fw-light fst-italic px-2">- Maximum length 25 characters</span>
+      </label>
       <div className={`input-group has-validation`}>
         <input
           type="text"
           ref={usernameInput}
           value={usernameValue}
           onChange={handleInput}
+          maxLength={25}
           className={`form-control ${isFormClean ? '' : isValid ? 'is-valid' : 'is-invalid'}`}
           id="new-username"
           placeholder="New Username"

@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
-const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
+const { uniqueNamesGenerator, adjectives, animals, NumberDictionary } = require('@joaomoreno/unique-names-generator');
 const errorMiddleware = require('./error-middleware');
 const {
   determineSortOrder,
@@ -19,6 +19,13 @@ const {
   seekImprovedBookDescription,
   urlExists
 } = require('./helpers');
+
+const uniqueNamesConfig = {
+  dictionaries: [adjectives, animals, NumberDictionary.generate({ min: 100, max: 999 })],
+  length: 3,
+  separator: '',
+  style: 'capital'
+};
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -426,11 +433,7 @@ app.get('/api/auth', async (req, res) => {
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
 
-  const username = uniqueNamesGenerator({
-    dictionaries: [adjectives, colors, animals],
-    separator: '',
-    style: 'capital'
-  });
+  const username = uniqueNamesGenerator(uniqueNamesConfig);
 
   const createNewUser = `
     with "newUser" as (
