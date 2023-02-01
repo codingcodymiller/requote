@@ -3,23 +3,30 @@ import BookCover, { BookData } from './book-cover';
 import Glider from 'react-glider';
 import 'glider-js/glider.min.css';
 import { QuotesContext, QuotesContextValue } from '../pages/quote-dashboard';
+import LoadingSpinner from './loading-spinner';
 
 export default function BookCarousel () {
   const { quoteList }: QuotesContextValue = useContext(QuotesContext)
   const [bookList, updateBookList] = useState([]);
+  const [isLoading, setLoadingStatus] = useState(true);
 
   useEffect(() => {
     let isComponentMounted = true;
 
     fetch(`/api/books/`)
       .then(res => res.json())
-      .then(res => updateBookList(res))
+      .then(res => {
+        updateBookList(res);
+        setLoadingStatus(false);
+      })
       .catch(err => {
         console.error("error:", err)
       })
 
     return () => { isComponentMounted = false }
   }, [quoteList])
+
+  if(isLoading) return <LoadingSpinner />
 
   const bookSlides = bookList.map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} className="px-1" />);
   bookSlides.unshift(<BookCover title="All Books" image="/images/all-books-graphic.jpg" key="all-books" />)
