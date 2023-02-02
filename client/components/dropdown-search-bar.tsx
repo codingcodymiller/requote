@@ -22,16 +22,23 @@ type DropdownSearchBarProps = {
   searchTerm: string;
   setSelectedOption: Dispatch<SetStateAction<Option>>;
   updateSearchTerm: Dispatch<SetStateAction<string>>;
+  setFormSubmitted: Dispatch<SetStateAction<boolean>>
   handleSearchSubmit: (searchTerm: string, option: string) => void;
 }
 
 export default function DropdownSearchBar(props: DropdownSearchBarProps) {
-  const { label, className, options, selectedOption, setSelectedOption, searchTerm, updateSearchTerm } = props;
+  const { label, className, options, selectedOption, setSelectedOption, searchTerm, updateSearchTerm, setFormSubmitted } = props;
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     props.handleSearchSubmit(searchTerm, selectedOption.value)
   };
+  const handleChange = (val: string) => {
+    updateSearchTerm(val);
+    if(val === "") {
+      setFormSubmitted(false);
+    }
+  }
   let optionsList = Object.values(options).map(option => <Dropdown.Item key={option.label} onClick={() => setSelectedOption(option)} href="#">{option.label}</Dropdown.Item>)
 
   return (
@@ -55,7 +62,7 @@ export default function DropdownSearchBar(props: DropdownSearchBarProps) {
           className="form-control rounded-end"
           placeholder={selectedOption.placeholder || ''}
           value={searchTerm}
-          updateValue={updateSearchTerm}
+          updateValue={handleChange}
         />
         <button className="position-absolute translate-middle-y end-0 top-50 mx-3 border-0 bg-transparent">
           <i className="fa-solid fa-magnifying-glass"></i>

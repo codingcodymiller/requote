@@ -118,7 +118,7 @@ app.post('/api/save', async (req, res) => {
     res.status(500).json(err);
   }
   // code below attempts to get a better image for the book from the OpenLibrary Book Covers API
-  const imageExists = urlExists(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`);
+  const imageExists = await urlExists(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`);
   if (imageExists) {
     const updateImage = `
       update "books" as "b"
@@ -134,7 +134,7 @@ app.post('/api/save', async (req, res) => {
   }
 
   // code below attempts to get a better description for the book from the Google Books API
-  const description = seekImprovedBookDescription(isbn);
+  const description = await seekImprovedBookDescription(isbn);
   if (description) {
     const updateDescription = `
       update "books" as "b"
@@ -233,6 +233,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
      )
      select "q"."page",
             "q"."quoteText",
+            "q"."isPrivate",
             "q"."pubQuoteId" as "quoteId",
             "b"."title" as "bookTitle",
             "b"."authors" as "bookAuthors",

@@ -25,6 +25,7 @@ export default function BookSearch() {
   }
   const [results, updateResults] = useState([]);
   const [isLoading, setLoadingStatus] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const sessionSearchTerm = sessionStorage.getItem("book-search-term");
   const sessionSearchOption = sessionStorage.getItem("book-search-option")
   const [searchTerm, updateSearchTerm] = useState(sessionSearchTerm || "")
@@ -37,6 +38,7 @@ export default function BookSearch() {
       .then(res => {
         updateResults(res);
         setLoadingStatus(false);
+        setFormSubmitted(true);
       });
   }
   if (sessionSearchTerm && sessionSearchOption){
@@ -58,11 +60,13 @@ export default function BookSearch() {
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
         updateSearchTerm={updateSearchTerm}
-        handleSearchSubmit={searchBooks} />
+        handleSearchSubmit={searchBooks}
+        setFormSubmitted={setFormSubmitted}
+      />
       {
         isLoading
           ? <LoadingSpinner />
-          : <ResultList results={results} searchTerm={searchTerm} />
+          : <ResultList results={results} searchTerm={searchTerm} formSubmitted={formSubmitted} />
       }
     </BookSearchContext.Provider>
   );
