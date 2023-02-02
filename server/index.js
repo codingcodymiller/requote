@@ -153,22 +153,23 @@ app.post('/api/save', async (req, res) => {
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
   const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  const { page, quoteText } = req.body;
+  const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
     with "user" as (
       select "userId" from "users"
-      where "token" = $4
+      where "token" = $5
     )
     update "quotes" as "q"
        set "page" = $1,
            "quoteText" = $2,
-           "quoteVector" = to_tsvector($2)
+           "quoteVector" = to_tsvector($2),
+           "isPrivate" = $3
       from "user" as "u"
      where "q"."userId" = "u"."userId"
-       and "q"."pubQuoteId" = $3
+       and "q"."pubQuoteId" = $4
   `;
-  const params = [page, quoteText, quoteId, userTokenDecoded.sub];
+  const params = [page, quoteText, isPrivate, quoteId, userTokenDecoded.sub];
   try {
     await db.query(editQuote, params);
     res.sendStatus(204);
