@@ -4,6 +4,7 @@ CREATE TABLE "public"."quotes" (
   "quoteVector" TSVECTOR NOT NULL,
 	"page" integer DEFAULT NULL,
   "isDeleted" BOOLEAN DEFAULT FALSE,
+  "isPrivate" BOOLEAN DEFAULT FALSE,
 	"bookId" integer NOT NULL,
 	"quoteId" serial NOT NULL,
   "pubQuoteId" UUID NOT NULL,

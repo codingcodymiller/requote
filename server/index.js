@@ -82,7 +82,7 @@ app.post('/api/save', async (req, res) => {
     return res.status(401).json({ error: 'User token not valid' });
   }
 
-  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription } = req.body;
+  const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription, isPrivate } = req.body;
   const publicQuoteId = crypto.randomUUID();
   const publicBookId = crypto.randomUUID();
   const selectOrInsertBook = `
@@ -101,15 +101,15 @@ app.post('/api/save', async (req, res) => {
     ),
     "user" as (
       select "userId" from "users"
-      where "token" = $9
+      where "token" = $10
     )
-    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "pubQuoteId", "userId")
-    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($8), $10, "userId"
+    insert into "quotes" ("bookId", "page", "quoteText", "quoteVector", "isPrivate", "pubQuoteId", "userId")
+    select coalesce("existingBook"."bookId", "book"."bookId"), $7, $8, to_tsvector($8), $9, $11, "userId"
     from "book"
     full join "existingBook" on true
     join "user" on true
   `;
-  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, publicBookId, page, quoteText, userTokenDecoded.sub, publicQuoteId];
+  const params = [bookTitle, bookAuthors, bookImage, bookDescription, isbn, publicBookId, page, quoteText, isPrivate, userTokenDecoded.sub, publicQuoteId];
   try {
     await db.query(selectOrInsertBook, params);
     res.sendStatus(201);
@@ -153,22 +153,23 @@ app.post('/api/save', async (req, res) => {
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
   const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  const { page, quoteText } = req.body;
+  const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
     with "user" as (
       select "userId" from "users"
-      where "token" = $4
+      where "token" = $5
     )
     update "quotes" as "q"
        set "page" = $1,
            "quoteText" = $2,
-           "quoteVector" = to_tsvector($2)
+           "quoteVector" = to_tsvector($2),
+           "isPrivate" = $3
       from "user" as "u"
      where "q"."userId" = "u"."userId"
-       and "q"."pubQuoteId" = $3
+       and "q"."pubQuoteId" = $4
   `;
-  const params = [page, quoteText, quoteId, userTokenDecoded.sub];
+  const params = [page, quoteText, isPrivate, quoteId, userTokenDecoded.sub];
   try {
     await db.query(editQuote, params);
     res.sendStatus(204);
@@ -257,7 +258,8 @@ app.get('/api/quote/:quoteId', async (req, res) => {
 
   const getQuote = `
        select "q"."page",
-              "q"."quoteText"
+              "q"."quoteText",
+              "q"."isPrivate"
          from "quotes" as "q"
         where "q"."pubQuoteId" = $1
   `;
@@ -302,6 +304,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
        join "user" on true
       where "q"."userId" = "user"."userId"
         and "q"."isDeleted" = false
+        and "q"."isPrivate" = false
       ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
