@@ -16,6 +16,7 @@ type QuoteData = {
   bookImage: string;
   bookDescription: string;
   isbn: string;
+  isPrivate: boolean;
 }
 
 export default function SaveQuoteForm() {
@@ -38,6 +39,8 @@ export default function SaveQuoteForm() {
   const [modalVisible, toggleModal] = useState(false);
   const [page, updatePage] = useState(quoteData.page || '');
   const [quote, updateQuote] = useState(quoteData.quoteText || '')
+  const [isPrivate, updateQuotePrivacy] = useState(quoteData.isPrivate || false);
+  const [tooltipVisible, updateTooltipVisibility] = useState(false);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const quoteData = {
@@ -47,6 +50,7 @@ export default function SaveQuoteForm() {
       bookAuthors: authors,
       bookImage: image,
       bookDescription: description,
+      isPrivate,
       isbn
     };
     fetch('/api/save', {
@@ -102,7 +106,30 @@ export default function SaveQuoteForm() {
             onChange={updateQuote}
           />
         </div>
-        <div className="text-end">
+        <div className="d-flex justify-content-end align-items-center">
+          <div
+            className="mx-3 fs-5 d-flex align-items-center"
+            aria-label={`
+                Public quotes will be viewable by other users when shared,
+                whereas private quotes will be only visible in your personal quote feed.
+                `}
+            data-balloon-length="fit"
+            data-balloon-pos="up-right"
+            data-balloon-visible={tooltipVisible || null}
+          >
+            <div className="form-check form-switch mb-0 curser-pointer">
+              <input className="form-check-input" type="checkbox" role="switch" name="make-public" id="make-public" checked={!isPrivate} onChange={() => updateQuotePrivacy(!isPrivate)} />
+              <label className="form-check-label" htmlFor="make-public">
+                Make Public
+              </label>
+            </div>
+            <i
+              className="fa-solid fa-circle-info mx-2 text-light-grey"
+              onClick={() => updateTooltipVisibility(!tooltipVisible)}
+              onMouseOver={() => updateTooltipVisibility(true)}
+              onMouseOut={() => updateTooltipVisibility(false)}
+            ></i>
+          </div>
           <button className="btn btn-lg btn-navy my-2">Submit</button>
         </div>
       </form>
