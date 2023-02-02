@@ -8,6 +8,7 @@ import FormControlLabel from './form-control-label';
 type QuoteData = {
   page: string;
   quoteText: string;
+  isPrivate: boolean;
 }
 
 type EditProps = {
@@ -16,11 +17,31 @@ type EditProps = {
 
 export default function EditQuoteForm({quoteId}: EditProps) {
   const navigate = useNavigate();
+  const [page, updatePage] = useState('');
+  const [quote, updateQuote] = useState('')
+  const [isPrivate, updateQuotePrivacy] = useState(false);
+  const [tooltipVisible, updateTooltipVisibility] = useState(false);
+  useEffect(() => {
+    let isComponentMounted = true;
+
+    fetch(`/api/quote/${quoteId}`)
+    .then(res => res.json())
+    .then(({ page, quoteText, isPrivate }: QuoteData) => {
+      if (!isComponentMounted) return;
+      updatePage(page);
+      updateQuote(quoteText);
+      updateQuotePrivacy(isPrivate);
+    });
+
+    return () => { isComponentMounted = false }
+  }, [quoteId])
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const quoteData = {
       page: page || null,
-      quoteText: quote
+      quoteText: quote,
+      isPrivate
     };
     fetch(`/api/quote/${quoteId}`, {
       method: 'PATCH',
@@ -39,21 +60,6 @@ export default function EditQuoteForm({quoteId}: EditProps) {
         console.error(err)
       })
   };
-  const [page, updatePage] = useState('');
-  const [quote, updateQuote] = useState('')
-  useEffect(() => {
-    let isComponentMounted = true;
-
-    fetch(`/api/quote/${quoteId}`)
-      .then(res => res.json())
-      .then(({ page, quoteText }: QuoteData) => {
-        if (!isComponentMounted) return;
-        updatePage(page);
-        updateQuote(quoteText);
-      });
-
-    return () => { isComponentMounted = false }
-  }, [quoteId])
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -84,7 +90,30 @@ export default function EditQuoteForm({quoteId}: EditProps) {
             onChange={updateQuote}
           />
         </div>
-        <div className="text-end">
+        <div className="d-flex justify-content-end align-items-center">
+          <div
+            className="mx-3 fs-5 d-flex align-items-center"
+            aria-label={`
+              Public quotes will be viewable by other users when shared,
+              whereas private quotes will be only visible in your personal quote feed.
+            `}
+            data-balloon-length="fit"
+            data-balloon-pos="up-right"
+            data-balloon-visible={tooltipVisible || null}
+          >
+            <div className="form-check form-switch mb-0 curser-pointer">
+              <input className="form-check-input" type="checkbox" role="switch" name="make-public" id="make-public" checked={!isPrivate} onChange={() => updateQuotePrivacy(!isPrivate)} />
+              <label className="form-check-label" htmlFor="make-public">
+                Make Public
+              </label>
+            </div>
+            <i
+              className="fa-solid fa-circle-info mx-2 text-light-grey"
+              onClick={() => updateTooltipVisibility(!tooltipVisible)}
+              onMouseOver={() => updateTooltipVisibility(true)}
+              onMouseOut={() => updateTooltipVisibility(false)}
+            ></i>
+          </div>
           <button className="btn btn-lg btn-navy my-2">Submit</button>
         </div>
       </form>
