@@ -6,6 +6,7 @@ import { QuotesContext, QuotesContextValue } from '../pages/quote-dashboard'
 export type QuoteData = {
   page: number | null;
   quoteText: string;
+  isPrivate: boolean;
   quoteId: string;
   bookTitle: string;
   bookAuthors: string[];
@@ -99,6 +100,10 @@ export default function QuoteListItem(props: SingleQuoteProps){
                 </p>
               </div>
             </div>
+            <p className="m-0 position-absolute bottom-left tiny-text text-light-grey">
+              <i className={`mx-1 fa-solid fa-${quote.isPrivate ? "eye-slash" : "eye"}`}></i>
+              {quote.isPrivate ? "Private" : "Public"}
+            </p>
           </div>
         </div>
       </div>
