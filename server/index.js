@@ -258,7 +258,8 @@ app.get('/api/quote/:quoteId', async (req, res) => {
 
   const getQuote = `
        select "q"."page",
-              "q"."quoteText"
+              "q"."quoteText",
+              "q"."isPrivate"
          from "quotes" as "q"
         where "q"."pubQuoteId" = $1
   `;
@@ -303,6 +304,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
        join "user" on true
       where "q"."userId" = "user"."userId"
         and "q"."isDeleted" = false
+        and "q"."isPrivate" = false
       ${specificBookCondition} ${searchTermCondition}
    order by ${sortType} ${sortOrder}
   `;
