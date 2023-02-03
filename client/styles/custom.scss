@@ -16,6 +16,10 @@
   background-color: #f3eaf4;
 }
 
+.bg-dark-navy {
+  background-color: #3a405a;
+}
+
 .text-dark-navy {
   color: #3a405a;
 }
@@ -54,8 +58,8 @@
 }
 
 .top-right-lg {
-  top: 1rem;
-  right: 1.25rem;
+  top: 1.25rem;
+  right: 1.5rem;
 }
 
 .bottom-left {
@@ -93,12 +97,17 @@
   z-index: 10;
 }
 
-.hover-grow {
+.hover-grow,
+.hover-grow-lg {
   transition: transform 0.1s ease-in;
 }
 
-.hover-grow:hover {
+.hover-grow:hover:not(:has(> .cancel-ancestor-hover-grow:hover)) {
   transform: scale(1.01);
+}
+
+.hover-grow-lg:hover:not(:has(> .cancel-ancestor-hover-grow:hover)) {
+  transform: scale(1.4);
 }
 
 .bg-shadow {
@@ -106,6 +115,12 @@
 }
 
 /* SEMANTIC CLASSES */
+
+.icon-circle {
+  border-radius: 50%;
+  height: 25px;
+  width: 25px;
+}
 
 .hyperlink {
   text-decoration: none;
@@ -204,6 +219,7 @@
   aspect-ratio: 1/1.5;
   object-fit: cover;
   object-position: top;
+  overflow: hidden;
 }
 
 .landing-container {
