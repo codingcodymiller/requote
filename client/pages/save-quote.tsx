@@ -5,6 +5,7 @@ import SectionHeader from '../components/section-header';
 export const SelectedBookContext = React.createContext<BookDataContextValue>({} as BookDataContextValue);
 
 export type BookData = {
+  id?: number;
   title: string;
   authors: string[];
   image: string;
