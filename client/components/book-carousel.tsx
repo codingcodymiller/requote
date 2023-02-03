@@ -1,11 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import BookCover, { BookData } from './book-cover';
-import Glider from 'react-glider';
-import 'glider-js/glider.min.css';
+import BookCover from './book-cover';
 import { QuotesContext, QuotesContextValue } from '../pages/quote-dashboard';
 import LoadingSpinner from './loading-spinner';
+import { BookData } from '../pages/save-quote';
+import Glider from 'react-glider';
+import 'glider-js/glider.min.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function BookCarousel () {
+  const navigate = useNavigate();
+  const showQuotes = (book: BookData) => {
+    navigate(`/quotes/${book.id || ''}`, { replace: false });
+  }
   const { quoteList }: QuotesContextValue = useContext(QuotesContext)
   const [bookList, updateBookList] = useState([]);
   const [isLoading, setLoadingStatus] = useState(true);
@@ -28,8 +34,17 @@ export default function BookCarousel () {
 
   if(isLoading) return <LoadingSpinner />
 
-  const bookSlides = bookList.map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} className="px-1" />);
-  bookSlides.unshift(<BookCover title="All Books" image="/images/all-books-graphic.jpg" key="all-books" />)
+  const bookSlides = bookList.map((book: BookData) => <BookCover book={book} key={book.id} callback={showQuotes} className="px-1" />);
+
+  const allBooksData: BookData = {
+    title: "All Books",
+    image: "/images/all-books-graphic.jpg",
+    authors: [],
+    isbn: "",
+    description: ""
+  }
+  bookSlides.unshift(<BookCover book={allBooksData} key="all-books" callback={showQuotes} className="px-1" />);
+
   return (
     <div className="pb-2 px-4 mb-2 section-header">
       <Glider
