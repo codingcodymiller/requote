@@ -3,7 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import AppHeader from './components/app-header';
 import Home from './pages/home';
 import Library from './pages/library';
-import BookSearch from './components/book-search';
+// import BookSearch from './components/book-search';
+import SelectBookForQuote from './components/select-book-for-quote';
 import SaveQuote from './pages/save-quote';
 import SaveQuoteForm from './components/save-quote-form';
 import EditQuote from './pages/edit-quote'
@@ -33,7 +34,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/library" element={<Library />} />
             <Route path="/save-quote" element={<SaveQuote />}>
-              <Route path="book-search" element={<BookSearch />} />
+              <Route path="book-search" element={<SelectBookForQuote />} />
               <Route path="form" element={<SaveQuoteForm />} />
             </Route>
             <Route path="/edit-quote/:quoteId" element={<EditQuote />} />
