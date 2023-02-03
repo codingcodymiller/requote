@@ -19,7 +19,7 @@ export default function BookListItem(props: SingleBookProps) {
       navigate('/save-quote/form', { replace: false });
     }}>
       <div className="card h-100 shadow-sm p-2 pe-5 position-relative">
-        <BookDetailsIcon isbn={book.isbn} className="position-absolute top-right"/>
+        <BookDetailsIcon isbn={book.isbn} className="position-absolute top-right hover-grow-lg cancel-ancestor-hover-grow"/>
         <div className="row h-100">
           <div className="col-4 d-flex align-items-center">
             <img
