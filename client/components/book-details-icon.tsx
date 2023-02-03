@@ -20,6 +20,8 @@ export default function BookDetailsIcon (props: BookDetailsIconProps) {
   }
 
   return (
-    <i className={`fa-solid fa-circle-info text-light-grey ${props.className || ''}`} onClick={showBookDetails}></i>
+    <div className={`icon-circle bg-dark-navy d-flex justify-content-center align-items-center ${props.className || ''}`} onClick={showBookDetails}>
+      <i className={`fa-solid fa-lg fa-circle-info text-light`}></i>
+    </div>
   )
 }
