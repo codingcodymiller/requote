@@ -207,9 +207,10 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   if (!req.cookies.user_token) {
     return res.status(200).json([]);
   }
+
   const userTokenDecoded = jwt.decode(req.cookies.user_token);
   if (!verifyJWT(userTokenDecoded)) {
-    return res.status(200).json([]);
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   const { sort, order, searchTerm } = req.query;
@@ -342,7 +343,7 @@ app.get('/api/books', async (req, res) => {
   }
   const userTokenDecoded = jwt.decode(req.cookies.user_token);
   if (!verifyJWT(userTokenDecoded)) {
-    return res.status(200).json([]);
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   const getBooks = `
