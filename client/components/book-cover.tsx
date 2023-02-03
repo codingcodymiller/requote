@@ -19,7 +19,7 @@ export default function BookCover(props: BookCoverProps){
     <div className={`cursor-pointer hover-grow position-relative ${className || ''}`} onClick={callback ? () => callback(props.book) : undefined}>
       {
         details && !isLoading
-          ? <BookDetailsIcon isbn={isbn} className="position-absolute top-right-lg hover-grow-lg cancel-ancestor-hover-grow" />
+          ? <BookDetailsIcon isbn={isbn} className="position-absolute top-right-lg fs-5 hover-grow-lg cancel-ancestor-hover-grow" />
           : <></>
       }
       <img src={image} alt={title} onLoad={() => setLoadState(false)} className={`w-100 h-100 book-cover ${rounded ? 'br-10' : ''}  ${isLoading ? 'd-none' : ''}`} />
