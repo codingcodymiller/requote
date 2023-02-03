@@ -14,7 +14,7 @@ export default function BookListItem(props: SingleBookProps) {
   const [src, updateSrc] = useState(book.image);
   book.authors = formatAuthorNames(book.authors);
   return (
-    <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={e => {
+    <div className="col-12 col-md-6 col-lg-4 my-2 cursor-pointer hover-grow" onClick={() => {
       selectedBookData.setBookData(book);
       navigate('/save-quote/form', { replace: false });
     }}>

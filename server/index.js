@@ -351,9 +351,11 @@ app.get('/api/books', async (req, res) => {
       where "token" = $1
      )
      select distinct "b"."isbn",
+            "b"."pubBookId" as "id",
             "b"."title",
             "b"."image",
-            "b"."pubBookId" as "id",
+            "b"."authors",
+            "b"."isbn",
             "b"."description"
        from "books" as "b"
        join "quotes" as "q" using ("bookId")

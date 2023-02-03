@@ -1,6 +1,6 @@
 import React, { useContext, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom'
-import { BookSearchContext, SearchContextValue } from './book-search'
+import { BookSearchContext, SearchContextValue } from './select-book-for-quote'
 
 type BookDetailsIconProps = {
   isbn: string;

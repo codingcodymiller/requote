@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import DropdownSearchBar, { Option, OptionStore } from './dropdown-search-bar';
 import LoadingSpinner from './loading-spinner';
 import ResultList from './result-list';
+import LibraryBookList from './library-book-list';
+import { BookData, BookDataContextValue, SelectedBookContext } from '../pages/save-quote';
+import { useNavigate } from 'react-router-dom';
 
 export const BookSearchContext = React.createContext<SearchContextValue>({} as SearchContextValue);
 
@@ -10,7 +13,9 @@ export type SearchContextValue = {
   option: Option;
 }
 
-export default function BookSearch() {
+export default function SelectBookForQuote() {
+  const navigate = useNavigate();
+
   const options: OptionStore = {
     title: {
       label: "Book",
@@ -23,6 +28,7 @@ export default function BookSearch() {
       placeholder: "Ex: Stephen King"
     }
   }
+  const selectedBookData: BookDataContextValue = useContext(SelectedBookContext);
   const [results, updateResults] = useState([]);
   const [isLoading, setLoadingStatus] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -41,7 +47,12 @@ export default function BookSearch() {
         setFormSubmitted(true);
       });
   }
-  if (sessionSearchTerm && sessionSearchOption){
+
+  const selectBookFromLibrary = (book: BookData) => {
+    selectedBookData.setBookData(book);
+    navigate('/save-quote/form', { replace: false });
+  }
+  if (sessionSearchTerm && sessionSearchOption) {
     searchBooks(sessionSearchTerm, sessionSearchOption)
     sessionStorage.removeItem("book-search-term")
     sessionStorage.removeItem("book-search-option")
@@ -68,6 +79,10 @@ export default function BookSearch() {
           ? <LoadingSpinner />
           : <ResultList results={results} searchTerm={searchTerm} formSubmitted={formSubmitted} />
       }
+      <div className="d-flex justify-content-center">
+        <h5 className="text-uppercase my-3 px-3 py-1 divider-header text-center">Or select a book from your library:</h5>
+      </div>
+      <LibraryBookList onBookCoverClick={selectBookFromLibrary} />
     </BookSearchContext.Provider>
   );
 }

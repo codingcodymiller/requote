@@ -1,16 +1,40 @@
-import React from 'react';
-import BookCover, { BookData } from './book-cover';
+import React, { useEffect, useState } from 'react';
+import { BookData } from '../pages/save-quote';
+import BookCover from './book-cover';
+import LoadingSpinner from './loading-spinner';
 import NoBooks from './no-books';
 
 type LibraryListProps = {
-  results: BookData[]
+  onBookCoverClick?: (book: BookData) => void;
 }
 
 export default function LibraryBookList(props: LibraryListProps) {
-  if (!props.results.length) return <NoBooks />;
+  const [bookList, updateBookList] = useState([]);
+  const [isLoading, setLoadingStatus] = useState(false);
 
-  const results = props.results
-    .map((book: BookData) => <BookCover title={book.title} image={book.image} id={book.id} isbn={book.isbn} key={book.id} className="col-6 col-sm-4 col-md-3 col-lg-2 my-2" details rounded />);
+  useEffect(() => {
+    let isComponentMounted = true;
+
+    setLoadingStatus(true);
+    fetch(`/api/books/`)
+      .then(res => res.json())
+      .then(res => {
+        updateBookList(res);
+        setLoadingStatus(false);
+      })
+      .catch(err => {
+        console.error("error:", err)
+      })
+
+    return () => { isComponentMounted = false }
+  }, [])
+
+  if (isLoading) return <LoadingSpinner />
+  if (!bookList.length) return <NoBooks />;
+
+  const results = bookList.map(
+    (book: BookData) => <BookCover book={book} key={book.id} callback={props.onBookCoverClick} className="col-6 col-sm-4 col-md-3 col-lg-2 my-2" details rounded />
+  );
 
   return (
     <div className="row">

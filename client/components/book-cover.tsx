@@ -1,30 +1,35 @@
-import React from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { BookData } from "../pages/save-quote";
 import BookDetailsIcon from "./book-details-icon";
+import LoadingSpinner from "./loading-spinner";
 
-export type BookData = {
-  id?: number;
-  image: string;
-  title: string;
-  isbn?: string;
+export type BookCoverProps = {
+  book: BookData
   className?: string;
   details?: boolean;
   rounded?: boolean;
+  callback?: (book: BookData) => void;
 }
 
-export default function BookCover(props: BookData){
-  const navigate = useNavigate();
-  const showQuotes = () => {
-    navigate(`/quotes/${props.id || ''}`, { replace: false });
-  }
+export default function BookCover(props: BookCoverProps){
+  const { details, className, rounded, callback } = props;
+  const { isbn, title, image } = props.book;
+  const [isLoading, setLoadState] = useState(true);
   return (
-    <div className={`cursor-pointer hover-grow position-relative ${props.className || ''}`} onClick={showQuotes}>
+    <div className={`cursor-pointer hover-grow position-relative ${className || ''}`} onClick={callback ? () => callback(props.book) : undefined}>
       {
-        props.details
-          ? <BookDetailsIcon isbn={props.isbn || ''} className="position-absolute top-right-lg" />
+        details && !isLoading
+          ? <BookDetailsIcon isbn={isbn} className="position-absolute top-right-lg" />
           : <></>
       }
-      <img src={props.image} alt={props.title} className={`w-100 h-100 book-cover ${props.rounded ? 'br-10' : ''}`} />
+      <img src={image} alt={title} onLoad={() => setLoadState(false)} className={`w-100 h-100 book-cover ${rounded ? 'br-10' : ''}  ${isLoading ? 'd-none' : ''}`} />
+      {
+        isLoading
+          ? <div className={`w-100 h-100 pt-3`}>
+            <LoadingSpinner />
+          </div>
+        : <></>
+      }
     </div>
   )
 }
