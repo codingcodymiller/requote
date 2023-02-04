@@ -57,8 +57,8 @@ export default function QuoteListItem(props: SingleQuoteProps){
       <div className="card h-100 shadow-sm p-2 position-relative">
         <div className="row h-100">
           <div className="col-12">
-            <div className="d-flex justify-content-between pb-1 px-1 mb-1 border-bottom">
-              <div className="position-relative">
+            <div className="pb-1 px-1 mb-1 quote-info-row">
+              <div className="position-relative quote-edit-controls">
                 <div className="position-relative z-index-10 bg-white">
                   <i
                     onClick={() => navigate(`/edit-quote/${quote.quoteId}`)}

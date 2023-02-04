@@ -371,6 +371,33 @@ app.get('/api/books', async (req, res) => {
   res.status(200).json(bookList);
 });
 
+app.get('/api/books/:username', async (req, res) => {
+  const getBooks = `
+     with "user" as (
+      select "userId" from "users"
+      where "username" = $1
+     )
+     select distinct "b"."isbn",
+            "b"."pubBookId" as "id",
+            "b"."title",
+            "b"."image",
+            "b"."authors",
+            "b"."isbn",
+            "b"."description"
+       from "books" as "b"
+       join "quotes" as "q" using ("bookId")
+       join "user" on true
+      where "q"."userId" = "user"."userId"
+        and "q"."isDeleted" = false
+        and "q"."isPrivate" = false
+   order by "b"."title" asc
+  `;
+  const params = [req.params.username];
+  const result = await db.query(getBooks, params);
+  const bookList = result.rows;
+  res.status(200).json(bookList);
+});
+
 app.get('/api/book/:isbn', async (req, res) => {
   const { isbn } = req.params;
   const getBook = `
@@ -440,7 +467,16 @@ app.get('/api/auth', async (req, res) => {
   const { access_token, id_token } = tokens;
   const decodedId = jwt.decode(id_token);
 
-  const username = uniqueNamesGenerator(uniqueNamesConfig);
+  if (!verifyJWT(decodedId)) {
+    res.redirect(req.session.originalUrl);
+    delete req.session.originalUrl;
+    return;
+  }
+
+  let username = uniqueNamesGenerator(uniqueNamesConfig);
+  while (username.length > 25) {
+    username = uniqueNamesGenerator(uniqueNamesConfig);
+  }
 
   const createNewUser = `
     with "newUser" as (
