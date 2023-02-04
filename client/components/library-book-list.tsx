@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { BookData } from '../pages/save-quote';
 import BookCover from './book-cover';
 import LoadingSpinner from './loading-spinner';
@@ -12,21 +11,25 @@ type LibraryListProps = {
 export default function LibraryBookList(props: LibraryListProps) {
   const [bookList, updateBookList] = useState([]);
   const [isLoading, setLoadingStatus] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     let isComponentMounted = true;
 
     setLoadingStatus(true);
     fetch(`/api/books/`)
-      .then(res => res.json())
+      .then(res => {
+        if(res.status === 401) {
+          throw new Error("Invalid login credentials")
+        }
+        return res.json()
+      })
       .then(res => {
         updateBookList(res);
         setLoadingStatus(false);
       })
       .catch(err => {
+        window.location.href = '/api/logout'
         console.error("error:", err)
-        navigate(`/api/logout`, { replace: false })
       })
 
     return () => { isComponentMounted = false }
