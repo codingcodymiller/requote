@@ -64,24 +64,26 @@ export default function QuoteDashboard () {
   return (
     <QuotesContext.Provider value={contextValue}>
       <SectionHeader text="Quotes" />
-      { quoteList.length ? <BookCarousel /> : <></> }
-      <QuoteSearch
-        sortType={sortType}
-        isReversed={isReversed}
-        updateSortType={updateSortType}
-        updateIsReversed={updateIsReversed}
-        updateSearchTerm={updateSearchTerm}
-        disabled={!quoteList.length && !searchTerm}
-      />
-      {
-        quoteList.length > 0 ?
-          <QuoteList quotes={quoteList} /> :
-          isLoading ?
-            <LoadingSpinner /> :
-            searchTerm ?
-              <NoResults /> :
-              <NoQuotes />
-      }
+      <div className={ username ? "shared" : undefined }>
+        {quoteList.length ? <BookCarousel username={username} /> : <></>}
+        <QuoteSearch
+          sortType={sortType}
+          isReversed={isReversed}
+          updateSortType={updateSortType}
+          updateIsReversed={updateIsReversed}
+          updateSearchTerm={updateSearchTerm}
+          disabled={!quoteList.length && !searchTerm}
+        />
+        {
+          quoteList.length > 0 ?
+            <QuoteList quotes={quoteList} /> :
+            isLoading ?
+              <LoadingSpinner /> :
+              searchTerm ?
+                <NoResults /> :
+                <NoQuotes />
+        }
+      </div>
     </QuotesContext.Provider>
   )
 }
