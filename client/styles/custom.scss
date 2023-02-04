@@ -122,6 +122,21 @@
   width: 22px;
 }
 
+.quote-info-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.shared .quote-info-row {
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.shared .quote-edit-controls {
+  display: none;
+}
+
 .hyperlink {
   text-decoration: none;
 }
