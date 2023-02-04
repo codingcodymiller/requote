@@ -1,5 +1,5 @@
 import React, { useState, useEffect, SetStateAction, Dispatch } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import SectionHeader from '../components/section-header';
 import BookCarousel from '../components/book-carousel';
 import QuoteSearch from '../components/quote-search';
@@ -27,7 +27,6 @@ export default function QuoteDashboard () {
   const [quoteList, updateQuoteList] = useState([]);
   const [isLoading, setLoadingStatus] = useState(true);
   const { bookId, username } = useParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -42,16 +41,21 @@ export default function QuoteDashboard () {
     }
 
     fetch(url)
-    .then(res => res.json())
-    .then(res => {
-      if (!isComponentMounted) return;
-      updateQuoteList(res);
-      setLoadingStatus(false);
-    })
-    .catch(err => {
-      console.error("error:", err)
-      navigate(`/api/logout`, { replace: false })
-    });
+      .then(res => {
+        if (res.status === 401) {
+          throw new Error("Invalid login credentials")
+        }
+        return res.json()
+      })
+      .then(res => {
+        if (!isComponentMounted) return;
+        updateQuoteList(res);
+        setLoadingStatus(false);
+      })
+      .catch(err => {
+        console.error("error:", err)
+        window.location.href = '/api/logout'
+      });
 
     return () => { isComponentMounted = false }
   }, [searchTerm, sortType, isReversed, bookId, username])
