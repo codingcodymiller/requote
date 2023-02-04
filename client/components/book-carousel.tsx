@@ -7,7 +7,11 @@ import Glider from 'react-glider';
 import 'glider-js/glider.min.css';
 import { useNavigate } from 'react-router-dom';
 
-export default function BookCarousel () {
+type CarouselProps = {
+  username?: string;
+}
+
+export default function BookCarousel ({ username }: CarouselProps) {
   const navigate = useNavigate();
   const showQuotes = (book: BookData) => {
     navigate(`/quotes/${book.id || ''}`, { replace: false });
@@ -19,7 +23,7 @@ export default function BookCarousel () {
   useEffect(() => {
     let isComponentMounted = true;
 
-    fetch(`/api/books/`)
+    fetch(`/api/books/${username || ''}`)
       .then(res => res.json())
       .then(res => {
         updateBookList(res);
