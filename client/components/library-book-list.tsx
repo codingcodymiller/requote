@@ -17,12 +17,18 @@ export default function LibraryBookList(props: LibraryListProps) {
 
     setLoadingStatus(true);
     fetch(`/api/books/`)
-      .then(res => res.json())
+      .then(res => {
+        if(res.status === 401) {
+          throw new Error("Invalid login credentials")
+        }
+        return res.json()
+      })
       .then(res => {
         updateBookList(res);
         setLoadingStatus(false);
       })
       .catch(err => {
+        window.location.href = '/api/logout'
         console.error("error:", err)
       })
 

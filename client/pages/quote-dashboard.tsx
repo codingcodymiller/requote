@@ -41,15 +41,21 @@ export default function QuoteDashboard () {
     }
 
     fetch(url)
-    .then(res => res.json())
-    .then(res => {
-      if (!isComponentMounted) return;
-      updateQuoteList(res);
-      setLoadingStatus(false);
-    })
-    .catch(err => {
-      console.error("error:", err)
-    });
+      .then(res => {
+        if (res.status === 401) {
+          throw new Error("Invalid login credentials")
+        }
+        return res.json()
+      })
+      .then(res => {
+        if (!isComponentMounted) return;
+        updateQuoteList(res);
+        setLoadingStatus(false);
+      })
+      .catch(err => {
+        console.error("error:", err)
+        window.location.href = '/api/logout'
+      });
 
     return () => { isComponentMounted = false }
   }, [searchTerm, sortType, isReversed, bookId, username])
