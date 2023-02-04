@@ -23,6 +23,7 @@ function determineSortType(requestedType) {
 }
 
 function verifyJWT(jwt) {
+  if (!jwt) return false;
   if (
     (jwt.iss !== 'https://accounts.google.com' && jwt.iss !== 'accounts.google.com') ||
     jwt.aud !== process.env.GOOGLE_CLIENT_ID ||
