@@ -37,9 +37,10 @@ export default function App() {
               <Route path="form" element={<SaveQuoteForm />} />
             </Route>
             <Route path="/edit-quote/:quoteId" element={<EditQuote />} />
-            <Route path="/:username/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes" element={<QuoteDashboard />} />
             <Route path="/quotes/:bookId" element={<QuoteDashboard />} />
+            <Route path="/:username/quotes" element={<QuoteDashboard />} />
+            <Route path="/:username/quotes/:bookId" element={<QuoteDashboard />} />
             <Route path="/book-details/:isbn" element={<BookDetails />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
