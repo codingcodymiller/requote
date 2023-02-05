@@ -283,7 +283,7 @@ app.get('/api/:username/shared-quotes/:bookId?', async (req, res) => {
   const params = [username];
 
   if (bookId) params.push(bookId);
-  const specificBookCondition = bookId ? 'and "b"."bookId" = $' + params.length : '';
+  const specificBookCondition = bookId ? 'and "b"."pubBookId" = $' + params.length : '';
 
   if (searchTerm) params.push(searchTerm);
   const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
