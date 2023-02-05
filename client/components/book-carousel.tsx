@@ -14,7 +14,7 @@ type CarouselProps = {
 export default function BookCarousel ({ username }: CarouselProps) {
   const navigate = useNavigate();
   const showQuotes = (book: BookData) => {
-    navigate(`/quotes/${book.id || ''}`, { replace: false });
+    navigate(`${username ? `/${username}` : ''}/quotes/${book.id || ''}`, { replace: false });
   }
   const { quoteList }: QuotesContextValue = useContext(QuotesContext)
   const [bookList, updateBookList] = useState([]);
