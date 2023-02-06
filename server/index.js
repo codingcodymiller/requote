@@ -15,7 +15,7 @@ const errorMiddleware = require('./error-middleware');
 const {
   determineSortOrder,
   determineSortType,
-  verifyJWT,
+  signJWT,
   seekImprovedBookDescription,
   urlExists
 } = require('./helpers');
@@ -74,11 +74,14 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(401).json({ error: 'User not authenticated' });
   }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
+
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ error: 'User token not valid' });
   }
 
@@ -152,7 +155,7 @@ app.post('/api/save', async (req, res) => {
 });
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
@@ -181,7 +184,7 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
 
 app.patch('/api/delete-quote', async (req, res) => {
   try {
-    const userTokenDecoded = jwt.decode(req.cookies.user_token);
+    const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
     const { quoteId } = req.body;
     const deleteQuote = `
       with "user" as (
@@ -204,12 +207,14 @@ app.patch('/api/delete-quote', async (req, res) => {
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(200).json([]);
   }
 
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
@@ -348,11 +353,14 @@ app.get('/api/search/:book', async (req, res) => {
 });
 
 app.get('/api/books', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(200).json([]);
   }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
+
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
@@ -474,10 +482,12 @@ app.get('/api/auth', async (req, res) => {
   const tokens = await response.json();
 
   // eslint-disable-next-line camelcase
-  const { access_token, id_token } = tokens;
-  const decodedId = jwt.decode(id_token);
-
-  if (!verifyJWT(decodedId)) {
+  const { id_token } = tokens;
+  const signedJWT = signJWT(id_token);
+  let decodedId;
+  try {
+    decodedId = jwt.verify(signedJWT, process.env.JWT_SECRET);
+  } catch (err) {
     res.redirect(req.session.originalUrl);
     delete req.session.originalUrl;
     return;
@@ -503,29 +513,24 @@ app.get('/api/auth', async (req, res) => {
   const params = [decodedId.sub, username];
   const userResponse = await db.query(createNewUser, params);
   const userData = userResponse.rows[0];
-  res.cookie('access_token', access_token)
-    .cookie('username', userData.username)
-    .cookie('user_token', id_token, {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
-    .status(201)
-    .redirect(req.session.originalUrl);
-  delete req.session.originalUrl;
+  req.session.idToken = signedJWT;
+  req.session.save(function () {
+    res.cookie('username', userData.username)
+      .status(201)
+      .redirect(req.session.originalUrl);
+    delete req.session.originalUrl;
+  });
 });
 
 app.get('/api/logout', (req, res) => {
-  res.clearCookie('access_token')
-    .clearCookie('username')
-    .clearCookie('user_token', {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
-    .redirect('/');
+  delete req.session.idToken;
+  req.session.save(function () {
+    res.clearCookie('username').redirect('/');
+  });
 });
 
 app.get('/api/username-available', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
   }
   const { username } = req.query;
@@ -543,14 +548,17 @@ app.get('/api/username-available', async (req, res) => {
 });
 
 app.patch('/api/change-username', async (req, res) => {
-  const { user_token: userToken } = req.cookies;
   const { username: newUsername } = req.body;
-  if (!userToken) {
+
+  if (!req.session.idToken) {
     return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
   }
-  const userTokenDecoded = jwt.decode(userToken);
-  if (!verifyJWT(userTokenDecoded)) {
-    return res.status(403).json({ message: 'Invalid login.' });
+
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   try {
