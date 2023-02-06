@@ -155,7 +155,7 @@ app.post('/api/save', async (req, res) => {
 });
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
-  const userTokenDecoded = jwt.decode(req.session.idToken);
+  const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
@@ -184,7 +184,7 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
 
 app.patch('/api/delete-quote', async (req, res) => {
   try {
-    const userTokenDecoded = jwt.verify(req.session.idToken);
+    const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
     const { quoteId } = req.body;
     const deleteQuote = `
       with "user" as (
@@ -356,7 +356,7 @@ app.get('/api/books', async (req, res) => {
   if (!req.session.idToken) {
     return res.status(200).json([]);
   }
-  const userTokenDecoded = jwt.decode(req.session.idToken);
+  const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   if (!verifyJWT(userTokenDecoded)) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
