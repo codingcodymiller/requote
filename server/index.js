@@ -82,7 +82,7 @@ app.post('/api/save', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ error: 'User not authenticated' });
   }
 
   const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription, isPrivate } = req.body;
@@ -159,7 +159,7 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
   const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
@@ -192,7 +192,7 @@ app.patch('/api/delete-quote', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   const { quoteId } = req.body;
@@ -227,7 +227,7 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   const { sort, order, searchTerm } = req.query;
@@ -373,7 +373,7 @@ app.get('/api/books', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   const getBooks = `
@@ -570,7 +570,7 @@ app.patch('/api/change-username', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.redirect('/api/logout');
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   try {
