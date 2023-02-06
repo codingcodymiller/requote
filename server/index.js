@@ -206,7 +206,7 @@ app.patch('/api/delete-quote', async (req, res) => {
       from "user" as "u"
      where "q"."userId" = "u"."userId"
        and "q"."pubQuoteId" = $1
-    `;
+  `;
   const params = [quoteId, userTokenDecoded.sub];
 
   try {
