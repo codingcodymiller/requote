@@ -7,6 +7,7 @@ import FormControlInput from './form-control-input';
 import FormControlLabel from './form-control-label';
 import Modal from './modal';
 import { SelectedBookContext } from '../pages/save-quote';
+import { UserContext } from '../app'
 
 type QuoteData = {
   page: string | null;
@@ -22,6 +23,7 @@ type QuoteData = {
 export default function SaveQuoteForm() {
   const navigate = useNavigate();
   const selectedBook = useContext(SelectedBookContext);
+  const currentUser = useContext(UserContext);
   let { isbn, title, authors, image, description } = selectedBook.data;
   let quoteData: QuoteData = {} as QuoteData;
   if(!isbn) {
@@ -73,6 +75,10 @@ export default function SaveQuoteForm() {
       .catch(err => {
         console.error(err)
         sessionStorage.setItem("quote-to-save", JSON.stringify(quoteData));
+        if(currentUser.username){
+          window.location.href = '/api/logout';
+          return;
+        }
         toggleModal(!modalVisible)
       })
   };

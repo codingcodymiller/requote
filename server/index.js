@@ -82,7 +82,7 @@ app.post('/api/save', async (req, res) => {
   try {
     userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
   } catch (err) {
-    return res.status(401).json({ error: 'User token not valid' });
+    return res.status(401).json({ error: 'User not authenticated' });
   }
 
   const { quoteText, page, isbn, bookTitle, bookAuthors, bookImage, bookDescription, isPrivate } = req.body;
@@ -155,7 +155,12 @@ app.post('/api/save', async (req, res) => {
 });
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
-  const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid login credentials' });
+  }
   const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
@@ -183,21 +188,28 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
 });
 
 app.patch('/api/delete-quote', async (req, res) => {
+  let userTokenDecoded;
   try {
-    const userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
-    const { quoteId } = req.body;
-    const deleteQuote = `
-      with "user" as (
-        select "userId" from "users"
-        where "token" = $2
-      )
-      update "quotes" as "q"
-        set "isDeleted" = true
-        from "user" as "u"
-      where "q"."userId" = "u"."userId"
-        and "q"."pubQuoteId" = $1
-    `;
-    const params = [quoteId, userTokenDecoded.sub];
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid login credentials' });
+  }
+
+  const { quoteId } = req.body;
+  const deleteQuote = `
+    with "user" as (
+      select "userId" from "users"
+       where "token" = $2
+    )
+    update "quotes" as "q"
+       set "isDeleted" = true
+      from "user" as "u"
+     where "q"."userId" = "u"."userId"
+       and "q"."pubQuoteId" = $1
+  `;
+  const params = [quoteId, userTokenDecoded.sub];
+
+  try {
     await db.query(deleteQuote, params);
     res.sendStatus(204);
   } catch (err) {

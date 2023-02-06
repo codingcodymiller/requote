@@ -51,7 +51,10 @@ export default function EditQuoteForm({quoteId}: EditProps) {
       body: JSON.stringify(quoteData)
     })
       .then(res => {
-        if(res.status !== 204){
+        if (res.status === 401) {
+          window.location.href = '/api/logout'
+          return;
+        } else if(res.status !== 204){
           throw new Error("Quote edit did not complete successfully")
         }
         navigate(`/quotes#${quoteId}`)

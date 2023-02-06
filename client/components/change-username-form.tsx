@@ -30,7 +30,10 @@ export default function ChangeUsernameForm(){
     })
       .then(res => res.json().then(resData => ({ status: res.status, message: resData.message})))
       .then(res => {
-        if(res.status !== 200){
+        if (res.status === 401) {
+          window.location.href = '/api/logout'
+          return;
+        } else if(res.status !== 200) {
           throw new Error(res.message)
         }
         updateValidity(true);

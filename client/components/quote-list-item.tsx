@@ -35,7 +35,10 @@ export default function QuoteListItem(props: SingleQuoteProps){
       body: JSON.stringify(quoteData)
     })
       .then(res => {
-        if (res.status !== 204) {
+        if(res.status === 401) {
+          window.location.href = '/api/logout'
+          return;
+        } else if (res.status !== 204) {
           throw new Error("Quote deletion failed")
         }
         const order = isReversed ? "ascending" : "descending";
