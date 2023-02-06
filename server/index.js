@@ -15,7 +15,7 @@ const errorMiddleware = require('./error-middleware');
 const {
   determineSortOrder,
   determineSortType,
-  verifyJWT,
+  signJWT,
   seekImprovedBookDescription,
   urlExists
 } = require('./helpers');
@@ -474,10 +474,12 @@ app.get('/api/auth', async (req, res) => {
   const tokens = await response.json();
 
   // eslint-disable-next-line camelcase
-  const { access_token, id_token } = tokens;
-  const decodedId = jwt.decode(id_token);
-
-  if (!verifyJWT(decodedId)) {
+  const { id_token } = tokens;
+  const signedJWT = signJWT(id_token);
+  let decodedId;
+  try {
+    decodedId = jwt.verify(signedJWT);
+  } catch (err) {
     res.redirect(req.session.originalUrl);
     delete req.session.originalUrl;
     return;
@@ -503,25 +505,20 @@ app.get('/api/auth', async (req, res) => {
   const params = [decodedId.sub, username];
   const userResponse = await db.query(createNewUser, params);
   const userData = userResponse.rows[0];
-  res.cookie('access_token', access_token)
-    .cookie('username', userData.username)
-    .cookie('user_token', id_token, {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
-    .status(201)
-    .redirect(req.session.originalUrl);
-  delete req.session.originalUrl;
+  req.session.idToken = signedJWT;
+  req.session.save(function () {
+    res.cookie('username', userData.username)
+      .status(201)
+      .redirect(req.session.originalUrl);
+    delete req.session.originalUrl;
+  });
 });
 
 app.get('/api/logout', (req, res) => {
-  res.clearCookie('access_token')
-    .clearCookie('username')
-    .clearCookie('user_token', {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
-    .redirect('/');
+  delete req.session.idToken;
+  req.session.save(function () {
+    res.clearCookie('username').redirect('/');
+  });
 });
 
 app.get('/api/username-available', async (req, res) => {
