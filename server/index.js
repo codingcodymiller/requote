@@ -225,7 +225,12 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
   const specificBookCondition = bookId ? 'and "b"."pubBookId" = $' + params.length : '';
 
   if (searchTerm) params.push(searchTerm);
-  const searchTermCondition = searchTerm ? 'and "q"."quoteVector" @@ to_tsquery($' + params.length + ')' : '';
+  const searchTermCondition = searchTerm
+    ? `
+        and "q"."quoteVector" @@ to_tsquery($${params.length})
+        or "q"."quoteText" ilike '%' || $${params.length} || '%'
+      `
+    : '';
 
   const getQuotes = `
      with "user" as (
