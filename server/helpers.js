@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const jwt = require('jsonwebtoken');
 
 function determineSortOrder(requestedOrder) {
   switch (requestedOrder) {
@@ -22,16 +23,10 @@ function determineSortType(requestedType) {
   }
 }
 
-function verifyJWT(jwt) {
-  if (!jwt) return false;
-  if (
-    (jwt.iss !== 'https://accounts.google.com' && jwt.iss !== 'accounts.google.com') ||
-    jwt.aud !== process.env.GOOGLE_CLIENT_ID ||
-    jwt.exp * 1000 <= Date.now()
-  ) {
-    return false;
-  }
-  return true;
+function signJWT(idToken) {
+  const decodedToken = jwt.decode(idToken);
+  delete decodedToken.exp;
+  return jwt.sign(decodedToken, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
 
 async function getGoogleBooksIdByISBN(isbn) {
@@ -54,4 +49,4 @@ async function urlExists(url) {
   return response.status !== 404;
 }
 
-module.exports = { determineSortOrder, determineSortType, verifyJWT, seekImprovedBookDescription, urlExists };
+module.exports = { determineSortOrder, determineSortType, signJWT, seekImprovedBookDescription, urlExists };
