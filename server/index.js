@@ -548,14 +548,17 @@ app.get('/api/username-available', async (req, res) => {
 });
 
 app.patch('/api/change-username', async (req, res) => {
-  const { user_token: userToken } = req.cookies;
   const { username: newUsername } = req.body;
-  if (!userToken) {
+
+  if (!req.session.idToken) {
     return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
   }
-  const userTokenDecoded = jwt.decode(userToken);
-  if (!verifyJWT(userTokenDecoded)) {
-    return res.status(403).json({ message: 'Invalid login.' });
+
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
   try {
