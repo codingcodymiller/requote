@@ -74,11 +74,14 @@ app.listen(process.env.PORT, () => {
 });
 
 app.post('/api/save', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(401).json({ error: 'User not authenticated' });
   }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
-  if (!verifyJWT(userTokenDecoded)) {
+
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ error: 'User token not valid' });
   }
 
@@ -152,7 +155,7 @@ app.post('/api/save', async (req, res) => {
 });
 
 app.patch('/api/quote/:quoteId', async (req, res) => {
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  const userTokenDecoded = jwt.decode(req.session.idToken);
   const { page, quoteText, isPrivate } = req.body;
   const { quoteId } = req.params;
   const editQuote = `
@@ -181,7 +184,7 @@ app.patch('/api/quote/:quoteId', async (req, res) => {
 
 app.patch('/api/delete-quote', async (req, res) => {
   try {
-    const userTokenDecoded = jwt.decode(req.cookies.user_token);
+    const userTokenDecoded = jwt.verify(req.session.idToken);
     const { quoteId } = req.body;
     const deleteQuote = `
       with "user" as (
@@ -204,11 +207,11 @@ app.patch('/api/delete-quote', async (req, res) => {
 });
 
 app.get('/api/quotes/:bookId?', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(200).json([]);
   }
 
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  const userTokenDecoded = jwt.decode(req.session.idToken);
   if (!verifyJWT(userTokenDecoded)) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
@@ -348,10 +351,10 @@ app.get('/api/search/:book', async (req, res) => {
 });
 
 app.get('/api/books', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(200).json([]);
   }
-  const userTokenDecoded = jwt.decode(req.cookies.user_token);
+  const userTokenDecoded = jwt.decode(req.session.idToken);
   if (!verifyJWT(userTokenDecoded)) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
@@ -478,7 +481,7 @@ app.get('/api/auth', async (req, res) => {
   const signedJWT = signJWT(id_token);
   let decodedId;
   try {
-    decodedId = jwt.verify(signedJWT);
+    decodedId = jwt.verify(signedJWT, process.env.JWT_SECRET);
   } catch (err) {
     res.redirect(req.session.originalUrl);
     delete req.session.originalUrl;
@@ -522,7 +525,7 @@ app.get('/api/logout', (req, res) => {
 });
 
 app.get('/api/username-available', async (req, res) => {
-  if (!req.cookies.user_token) {
+  if (!req.session.idToken) {
     return res.status(403).json({ message: 'This action is only available to users who are currently logged in.' });
   }
   const { username } = req.query;
