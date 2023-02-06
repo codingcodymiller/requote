@@ -197,15 +197,15 @@ app.patch('/api/delete-quote', async (req, res) => {
 
   const { quoteId } = req.body;
   const deleteQuote = `
-  with "user" as (
-    select "userId" from "users"
-    where "token" = $2
+    with "user" as (
+      select "userId" from "users"
+       where "token" = $2
     )
     update "quotes" as "q"
-    set "isDeleted" = true
-    from "user" as "u"
-    where "q"."userId" = "u"."userId"
-    and "q"."pubQuoteId" = $1
+       set "isDeleted" = true
+      from "user" as "u"
+     where "q"."userId" = "u"."userId"
+       and "q"."pubQuoteId" = $1
     `;
   const params = [quoteId, userTokenDecoded.sub];
 
