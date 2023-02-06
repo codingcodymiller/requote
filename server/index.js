@@ -211,8 +211,10 @@ app.get('/api/quotes/:bookId?', async (req, res) => {
     return res.status(200).json([]);
   }
 
-  const userTokenDecoded = jwt.decode(req.session.idToken);
-  if (!verifyJWT(userTokenDecoded)) {
+  let userTokenDecoded;
+  try {
+    userTokenDecoded = jwt.verify(req.session.idToken, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ message: 'Invalid login credentials' });
   }
 
