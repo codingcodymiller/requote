@@ -4,4 +4,3 @@
 set -e
 
 npx lint-staged
-npm run test
