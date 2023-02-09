@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 import NoResults from "../components/no-results";
 
@@ -9,11 +9,11 @@ function renderNoResults() {
 
 describe("<NoResults />", () => {
   test("should have 'No results found' as its text content", async () => {
-    const { findByTestId } = renderNoResults();
+    render(<NoResults />);
 
-    const noResults = await findByTestId("no-results");
+    const noResults = screen.getByText(/No results found/i);
 
-    expect(noResults).toHaveTextContent("No results found")
+    expect(noResults).toBeInTheDocument();
   });
 
 });
