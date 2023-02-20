@@ -24,5 +24,14 @@ module.exports = {
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 
-  reporters: ['default', 'jest-junit']
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: './reports',
+        fileName: 'jest-junit.xml'
+      }
+    ]
+  ]
 };

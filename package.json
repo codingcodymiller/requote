@@ -10,7 +10,7 @@
     "build": "NODE_ENV=production webpack",
     "db:up": "node database/index.js",
     "prepare": "husky install",
-    "test": "jest --coverage",
+    "test": "jest",
     "test:watch": "jest --watch"
   },
   "dependencies": {
