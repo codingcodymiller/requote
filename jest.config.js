@@ -30,7 +30,7 @@ module.exports = {
       'jest-junit',
       {
         outputDirectory: './reports',
-        fileName: 'jest-junit.xml'
+        outputName: 'jest-junit.xml'
       }
     ]
   ]
