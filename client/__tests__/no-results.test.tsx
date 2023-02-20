@@ -8,7 +8,7 @@ function renderNoResults() {
 }
 
 describe("<NoResults />", () => {
-  test("should have 'No results found' as its text content", async () => {
+  test("should have 'No results found' as text content", async () => {
     render(<NoResults />);
 
     const noResults = screen.getByText(/No results found/i);
