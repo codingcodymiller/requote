@@ -16,7 +16,7 @@ export default function LibraryBookList(props: LibraryListProps) {
     let isComponentMounted = true;
 
     setLoadingStatus(true);
-    fetch(`/api/books/`)
+    fetch('/api/books')
       .then(res => {
         if(res.status === 401) {
           throw new Error("Invalid login credentials")

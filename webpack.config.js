@@ -139,7 +139,7 @@ module.exports = {
       threshold: 10240,
       minRatio: 0.8
     }),
-    new webpack.EnvironmentPlugin(['TINYMCE_KEY']),
+    new webpack.EnvironmentPlugin(['TINYMCE_KEY', 'NODE_ENV']),
     isDevelopment && new ReactRefreshWebpackPlugin(),
     isDevelopment && new webpack.NoEmitOnErrorsPlugin(),
     isDevelopment && new webpack.HotModuleReplacementPlugin()
