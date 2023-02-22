@@ -6,15 +6,12 @@ module.exports = {
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.[t|j]sx?$': 'ts-jest'
   },
-
   // Runs special logic, such as cleaning up components
   // when using React Testing Library and adds special
   // extended assertions to Jest
-  setupFilesAfterEnv: [
-    '@testing-library/jest-dom/extend-expect'
-  ],
+  setupFilesAfterEnv: ['./client/jest.setup.js'],
 
   // Test spec file resolution pattern
   // Matches parent folder `__tests__` and filename
