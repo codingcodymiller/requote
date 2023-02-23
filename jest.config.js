@@ -20,7 +20,12 @@ module.exports = {
 
   // Module file extensions for importing
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-
+  // substitute mock files for any css files imported in components
+  moduleNameMapper: {
+    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+      '<rootDir>/client/__mocks__/fileMock.js',
+    '\\.(css|less)$': '<rootDir>/client/__mocks__/styleMock.js'
+  },
   reporters: [
     'default',
     [
