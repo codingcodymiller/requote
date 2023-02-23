@@ -10,11 +10,11 @@ import LibraryBookList from '../components/library-book-list'
 describe('<LibraryBookList />', () => {
   it('Should have a loading element present while data is retrieved', () => {
     render(<LibraryBookList />, { wrapper: BrowserRouter })
-    expect(screen.getByText((/loading/i))).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
   })
   it('Should load a list of books that the user has saved quotes for', async () => {
     render(<LibraryBookList />, { wrapper: BrowserRouter })
-    await waitForElementToBeRemoved(screen.getByText(/loading/i))
+    await waitForElementToBeRemoved(screen.getByRole('status'))
 
     const books = screen.getAllByRole('button')
     expect(books).toHaveLength(2);
@@ -30,7 +30,7 @@ describe('<LibraryBookList />', () => {
       })
     )
     render(<LibraryBookList />, { wrapper: BrowserRouter })
-    await waitForElementToBeRemoved(screen.getByText(/loading/i))
+    await waitForElementToBeRemoved(screen.getByRole('status'))
 
     expect(screen.getByText((/no books/i))).toBeInTheDocument();
   })
