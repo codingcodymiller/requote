@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 export const handlers = [
-  rest.all('/api/books', (req, res, ctx) => {
+  rest.get('/api/books', (req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.set('Content-Type', 'application/json'),
