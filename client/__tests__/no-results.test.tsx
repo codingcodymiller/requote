@@ -1,11 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-
 import NoResults from "../components/no-results";
-
-function renderNoResults() {
-  return render(<NoResults />);
-}
 
 describe("<NoResults />", () => {
   test("should have 'No results found' as text content", async () => {
