@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { rest } from 'msw';
-import { server } from '../mocks/server'
+import { server } from '../__mocks__/server'
 
 import LibraryBookList from '../components/library-book-list'
 
@@ -16,7 +16,7 @@ describe('<LibraryBookList />', () => {
     render(<LibraryBookList />, { wrapper: BrowserRouter })
     await waitForElementToBeRemoved(screen.getByRole('status'))
 
-    const books = screen.getAllByRole('button')
+    const books = screen.getAllByTitle(/cover/i)
     expect(books).toHaveLength(2);
   })
   it('Should show that there are no books when a user has not saved any quotes for any books yet.', async () => {
@@ -29,6 +29,7 @@ describe('<LibraryBookList />', () => {
         );
       })
     )
+
     render(<LibraryBookList />, { wrapper: BrowserRouter })
     await waitForElementToBeRemoved(screen.getByRole('status'))
 
