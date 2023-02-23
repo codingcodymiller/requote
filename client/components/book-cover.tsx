@@ -17,7 +17,7 @@ export default function BookCover(props: BookCoverProps){
   const [imagePath, updateImagePath] = useState(image)
   const [isLoading, setLoadState] = useState(true);
   return (
-    <div role="button" className={`cursor-pointer hover-grow position-relative ${className || ''}`} onClick={callback ? () => callback(props.book) : undefined}>
+    <div role="button" title={`${title} Cover`} className={`cursor-pointer hover-grow position-relative ${className || ''}`} onClick={callback ? () => callback(props.book) : undefined}>
       {
         details && !isLoading
           ? <BookDetailsIcon isbn={isbn} className="position-absolute top-right-lg fs-5 hover-grow-lg cancel-ancestor-hover-grow" />
