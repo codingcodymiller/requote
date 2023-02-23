@@ -59,8 +59,8 @@ export default function BookCarousel ({ username }: CarouselProps) {
         rewind
         draggable
         hasArrows
-        iconLeft={<i className="fa-2xs fa-duotone fa-chevrons-left cursor-pointer hover-aqua-blue d-block pt-4"></i>}
-        iconRight={<i className="fa-2xs fa-duotone fa-chevrons-right cursor-pointer hover-aqua-blue d-block pt-4"></i>}
+        iconLeft={<i className="fa-2xs fa-duotone fa-chevrons-left cursor-pointer hover-aqua-blue d-block pt-4" role="button" title="previous"></i>}
+        iconRight={<i className="fa-2xs fa-duotone fa-chevrons-right cursor-pointer hover-aqua-blue d-block pt-4" role="button" title="next"></i>}
         responsive={[
           {
             breakpoint: 481,
