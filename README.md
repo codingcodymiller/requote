@@ -16,6 +16,8 @@ I have always been an avid reader, and I love taking note of passages that reson
 - PostgreSQL
 - HTML5
 - CSS3
+- Jest
+- React Testing Library
 - Tesseract.js
 - OAuth 2.0
 - Open ID Connect
