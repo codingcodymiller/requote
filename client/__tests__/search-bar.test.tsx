@@ -12,15 +12,16 @@ describe('<SearchBar />', () => {
     fireEvent.change(searchInput, { target: { value: 'The Hobbit' } })
     expect(searchInput).toHaveValue('The Hobbit')
   })
-  // it('Should submit the form if the magnifying glass icon is clicked.', async () => {
-  //   const submit = jest.fn()
-  //   render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />, { wrapper: BrowserRouter })
+  it('Should submit the form if the magnifying glass icon is clicked.', async () => {
+    const submit = jest.fn()
+    render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />, { wrapper: BrowserRouter })
+    const searchInput = screen.getByRole('textbox');
+    fireEvent.change(searchInput, { target: { value: 'The Hobbit' } })
+    const searchSubmit = screen.getByRole('button');
+    fireEvent.click(searchSubmit);
 
-  //   const bookCover = screen.getByRole('img')
-  //   fireEvent.load(bookCover)
-
-  //   expect(screen.queryByRole('status')).toBeNull();
-  // })
+    expect(submit).toHaveBeenCalled();
+  })
   // it('Should submit the form if the Enter button is pressed while the search bar is focused.', async () => {
   //   const submit = jest.fn()
   //   render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />, { wrapper: BrowserRouter })
