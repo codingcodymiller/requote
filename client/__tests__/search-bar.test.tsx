@@ -22,13 +22,4 @@ describe('<SearchBar />', () => {
 
     expect(submit).toHaveBeenCalled();
   })
-  // it('Should submit the form if the Enter button is pressed while the search bar is focused.', async () => {
-  //   const submit = jest.fn()
-  //   render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />, { wrapper: BrowserRouter })
-
-  //   const bookCover = screen.getByRole('img')
-  //   fireEvent.load(bookCover)
-
-  //   expect(screen.getByTitle(/book details/i)).toBeInTheDocument();
-  // })
 })
