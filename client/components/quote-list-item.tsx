@@ -64,10 +64,14 @@ export default function QuoteListItem(props: SingleQuoteProps){
               <div className="position-relative quote-edit-controls">
                 <div className="position-relative z-index-10 bg-white">
                   <i
+                    role="button"
+                    title="edit"
                     onClick={() => navigate(`/edit-quote/${quote.quoteId}`)}
                     className="fa-regular fa-lg fa-pen-nib text-light-grey text-decoration-none cursor-pointer hover-aqua-blue mx-1"
                   ></i>
                   <i
+                    role="button"
+                    title="delete"
                     onClick={() => setInProp(!inProp)}
                     className="fa-regular fa-lg fa-eraser text-light-grey text-decoration-none cursor-pointer hover-aqua-blue mx-1"
                   ></i>
@@ -75,10 +79,14 @@ export default function QuoteListItem(props: SingleQuoteProps){
                 <CSSTransition nodeRef={deleteOptionsRef} in={inProp} timeout={500} classNames="delete-options">
                   <div ref={deleteOptionsRef} className="delete-options">
                     <i
+                      role="button"
+                      title="cancel"
                       onClick={() => setInProp(!inProp)}
                       className="fa-regular fa-lg fa-xmark text-danger cursor-pointer mx-1"
                     ></i>
                     <i
+                      role="button"
+                      title="confirm"
                       onClick={handleDelete}
                       className="fa-regular fa-lg fa-check text-success cursor-pointer mx-1"
                     ></i>
