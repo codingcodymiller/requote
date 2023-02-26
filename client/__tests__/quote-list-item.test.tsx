@@ -58,4 +58,9 @@ describe('<QuoteListItem />', () => {
     render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
     expect(screen.queryByText(quote.quoteText)).toBeVisible()
   })
+  it('Should show the author and name of the book the quote is from.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    expect(screen.queryByText(quote.bookTitle)).toBeVisible()
+    expect(screen.queryByText(quote.bookAuthors[0], { exact: false })).toBeVisible()
+  })
 })
