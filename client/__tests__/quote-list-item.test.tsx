@@ -31,4 +31,19 @@ describe('<QuoteListItem />', () => {
     expect(screen.getByTitle('cancel')).toBeVisible()
     expect(screen.getByTitle('confirm')).toBeVisible()
   })
+  it('Should hide the Cancel and Confirm icons if the Delete icon is clicked while Cancel and Confirm are visible.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    const deleteIcon = screen.getByTitle('delete')
+    fireEvent.click(deleteIcon);
+    fireEvent.click(deleteIcon);
+    expect(screen.queryByTitle('cancel')).toBeNull()
+    expect(screen.queryByTitle('confirm')).toBeNull()
+  })
+  it('Should hide the Cancel and Confirm icons if the Cancel icon is clicked while Cancel and Confirm are visible.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    fireEvent.click(screen.getByTitle('delete'));
+    fireEvent.click(screen.getByTitle('cancel'));
+    expect(screen.queryByTitle('cancel')).toBeNull()
+    expect(screen.queryByTitle('confirm')).toBeNull()
+  })
 })
