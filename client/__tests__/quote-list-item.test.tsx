@@ -46,4 +46,12 @@ describe('<QuoteListItem />', () => {
     expect(screen.queryByTitle('cancel')).toBeNull()
     expect(screen.queryByTitle('confirm')).toBeNull()
   })
+  it('Should show the user if a quote is public.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    expect(screen.queryByText(/public/i)).not.toBeNull()
+  })
+  it('Should show the user if a quote is private.', () => {
+    render(<QuoteListItem quote={{ ...quote, isPrivate: true }} />, { wrapper: BrowserRouter })
+    expect(screen.queryByText(/private/i)).not.toBeNull()
+  })
 })
