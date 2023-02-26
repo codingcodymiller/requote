@@ -56,6 +56,6 @@ describe('<QuoteListItem />', () => {
   })
   it('Should show the quoted text.', () => {
     render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
-    expect(screen.queryByText(quote.quoteText)).not.toBeNull()
+    expect(screen.queryByText(quote.quoteText)).toBeVisible()
   })
 })
