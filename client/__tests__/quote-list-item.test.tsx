@@ -54,4 +54,8 @@ describe('<QuoteListItem />', () => {
     render(<QuoteListItem quote={{ ...quote, isPrivate: true }} />, { wrapper: BrowserRouter })
     expect(screen.queryByText(/private/i)).not.toBeNull()
   })
+  it('Should show the quoted text.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    expect(screen.queryByText(quote.quoteText)).not.toBeNull()
+  })
 })
