@@ -7,14 +7,14 @@ import SearchBar from '../components/search-bar'
 
 describe('<SearchBar />', () => {
   it('Should show the text a user types as the value of the search bar.', () => {
-    render(<SearchBar placeholder='Search' handleSearchSubmit={() => {}} />, { wrapper: BrowserRouter })
+    render(<SearchBar placeholder='Search' handleSearchSubmit={() => {}} />)
     const searchInput = screen.getByRole('textbox');
     fireEvent.change(searchInput, { target: { value: 'The Hobbit' } })
     expect(searchInput).toHaveValue('The Hobbit')
   })
   it('Should submit the form if the magnifying glass icon is clicked.', async () => {
     const submit = jest.fn()
-    render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />, { wrapper: BrowserRouter })
+    render(<SearchBar placeholder='Search' handleSearchSubmit={submit} />)
     const searchInput = screen.getByRole('textbox');
     fireEvent.change(searchInput, { target: { value: 'The Hobbit' } })
     const searchSubmit = screen.getByRole('button');
