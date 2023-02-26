@@ -63,4 +63,8 @@ describe('<QuoteListItem />', () => {
     expect(screen.queryByText(quote.bookTitle)).toBeVisible()
     expect(screen.queryByText(quote.bookAuthors[0], { exact: false })).toBeVisible()
   })
+  it('Should show a page number if one is provided.', () => {
+    render(<QuoteListItem quote={quote} />, { wrapper: BrowserRouter })
+    expect(screen.queryByText(quote.page, { exact: false })).toBeVisible()
+  })
 })
