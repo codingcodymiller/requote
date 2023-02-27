@@ -22,5 +22,15 @@ export const handlers = [
           description: 'This isn\'t your grandpa\'s test.'
         }
       ]));
+  }),
+  rest.get('/api/quote/:quoteId', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.set('Content-Type', 'application/json'),
+      ctx.json({
+        page: 1,
+        quoteText: 'When you test stuff, you want it to work.',
+        isPrivate: false
+      }));
   })
 ];
