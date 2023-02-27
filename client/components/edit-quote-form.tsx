@@ -111,6 +111,8 @@ export default function EditQuoteForm({quoteId}: EditProps) {
               </label>
             </div>
             <i
+              role="button"
+              title="Public Explanation"
               className="fa-solid fa-circle-info mx-2 text-light-grey"
               onClick={() => updateTooltipVisibility(!tooltipVisible)}
               onMouseOver={() => updateTooltipVisibility(true)}
