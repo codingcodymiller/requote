@@ -8,6 +8,11 @@ import { BookData, SelectedBookContext } from '../pages/save-quote'
 
 
 describe('<SaveQuoteForm />', () => {
+  it('Should have Submit button disabled while the form is empty.', () => {
+    renderForm();
+    const submit = screen.getByTitle(/submit/i);
+    expect(submit).toBeDisabled()
+  })
   it('Should have tooltip visible when the info icon for making a quote public is clicked.', () => {
     renderForm();
     const infoIcon = screen.getByTitle(/public explanation/i)
