@@ -20,4 +20,16 @@ describe('<QuoteControls />', () => {
     expect(screen.getByTitle('reverse')).toBeVisible();
     expect(screen.getByTitle('share')).toBeVisible();
   })
+  it('Should not show share quotes icon if viewing a shared feed.', () => {
+    Object.defineProperty(window.document, 'cookie', {
+      writable: true,
+      value: 'username=codingcodymiller',
+    });
+    render(
+      <MemoryRouter initialEntries={['/codingcodymiller/quotes']}>
+        <QuoteControls sortType='date' isReversed={false} updateIsReversed={() => { }} updateSortType={() => { }} />
+      </MemoryRouter>
+    )
+    expect(screen.queryByTitle('share')).toBeNull();
+  })
 })
