@@ -117,7 +117,7 @@ export default function EditQuoteForm({quoteId}: EditProps) {
               onMouseOut={() => updateTooltipVisibility(false)}
             ></i>
           </div>
-          <button className="btn btn-lg btn-navy my-2">Submit</button>
+          <button className="btn btn-lg btn-navy my-2" disabled={quote === ''}>Submit</button>
         </div>
       </form>
     </>
