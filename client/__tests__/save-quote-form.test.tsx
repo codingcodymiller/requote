@@ -15,12 +15,6 @@ describe('<SaveQuoteForm />', () => {
     const tooltip = screen.getByLabelText('Public quotes will be viewable by other users when shared', { exact: false });
     expect(tooltip).toHaveAttribute('data-balloon-visible', 'true')
   })
-  // it('Should have Submit button disabled while the form is empty.', () => {
-  //   render(<SaveQuoteForm />, { wrapper: BrowserRouter })
-
-  //   const submit = screen.getByTitle(/submit/i);
-  //   expect(submit).toBeDisabled()
-  // })
 })
 
 function renderForm(){
