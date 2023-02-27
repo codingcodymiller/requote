@@ -32,4 +32,15 @@ describe('<QuoteControls />', () => {
     )
     expect(screen.queryByTitle('share')).toBeNull();
   })
+  it('Should show the modal containing filter options when the filter icon is clicked.', () => {
+    render(
+      <MemoryRouter initialEntries={['/quotes']}>
+        <QuoteControls sortType='date' isReversed={false} updateIsReversed={() => { }} updateSortType={() => { }} />
+      </MemoryRouter>
+    )
+    fireEvent.click(screen.getByTitle('filter'));
+    expect(screen.getByLabelText(/date added/i)).toBeVisible();
+    expect(screen.getByLabelText(/page number/i)).toBeVisible();
+    expect(screen.getByLabelText(/quote length/i)).toBeVisible();
+  })
 })
