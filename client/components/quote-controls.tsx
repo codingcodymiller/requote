@@ -44,8 +44,8 @@ export default function QuoteControls (props: SortProps){
       {
         viewingSharedQuotes || !username
           ? <></> :
-          <button aria-label={shareLabel} data-balloon-pos="up" className="btn btn-link text-dark px-1 mx-2" onMouseOut={resetLinkToolTip}>
-            <i title="share" className="fa-light fa-xl fa-share-nodes" onClick={handleCopyLink}></i>
+          <button title="share" aria-label={shareLabel} data-balloon-pos="up" className="btn btn-link text-dark px-1 mx-2" onMouseOut={resetLinkToolTip}>
+            <i className="fa-light fa-xl fa-share-nodes" onClick={handleCopyLink}></i>
           </button>
       }
       <Modal isOpen={modalVisible} handleClose={() => toggleModal(!modalVisible)}>
