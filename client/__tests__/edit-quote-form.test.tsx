@@ -21,7 +21,7 @@ describe('<EditQuoteForm />', () => {
     const tooltip = screen.getByLabelText('Public quotes will be viewable by other users when shared', { exact: false });
     expect(tooltip).toHaveAttribute('data-balloon-visible', 'true')
   })
-  it('Should have tooltip visible when the info icon for making a quote public is clicked.', () => {
+  it('Should have Submit button disabled when the Quote textarea is empty.', () => {
     server.use(
       rest.get('/api/quote/:quoteId', (req, res, ctx) => {
         return res(
