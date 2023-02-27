@@ -130,13 +130,14 @@ export default function SaveQuoteForm() {
               </label>
             </div>
             <i
+              title="Public Explanation"
               className="fa-solid fa-circle-info mx-2 text-light-grey"
               onClick={() => updateTooltipVisibility(!tooltipVisible)}
               onMouseOver={() => updateTooltipVisibility(true)}
               onMouseOut={() => updateTooltipVisibility(false)}
             ></i>
           </div>
-          <button className="btn btn-lg btn-navy my-2" disabled={quote === ''}>Submit</button>
+          <button className="btn btn-lg btn-navy my-2" disabled={quote === ''} title="Submit">Submit</button>
         </div>
       </form>
       <Modal isOpen={modalVisible} handleClose={() => toggleModal(!modalVisible)} className="text-center">
